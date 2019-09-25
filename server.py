@@ -17,7 +17,8 @@ server.bind(SOCKETFILE)
 print("Listening on Socket")
 
 while True:
-	server.listen(1)
+	## Allow 2 simultaneous Connections (Firebase App and Barcode Scanner)
+	server.listen(2)
 	conn, addr = server.accept()
 	data = conn.recv(1024)
 	if not data:
@@ -31,15 +32,24 @@ while True:
 		else:
 			print(dataString)
 			d = json.loads(dataString)
+			## Provided Data must have a type field
+			## Possible types: 
+			## UPDATE to update the internal data
+			## CHECK to check if a provided key belongs to a box
 			if d["type"] == "UPDATE":
 				print("Updating")
+				## Update DATA
+				## That means DATA is set to the recieved Data
 				DATA = d["BOXEN"]
 			elif d["type"] == "CHECK":
 				print("Checking Key")
 				found = False
 				key = d["key"]
+				## Search for the Box that can be opened with the provided Key
 				for box in DATA:
 					if DATA[box]["key"] == key:
+						## If the propper Box was found, 
+						## set found flag, send the Boxdata
 						found = True
 						print("Found matching Box")
 						reply = json.dumps(DATA[box])
@@ -47,5 +57,7 @@ while True:
 						conn.send(reply.encode("UTF-8"))
 						break
 				if not found:
+					## If no Box was found
+					## send an empty Dictionary
 					conn.send(json.dumps({}).encode("UTF-8"))
 

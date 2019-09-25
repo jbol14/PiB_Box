@@ -1,7 +1,9 @@
 const firebase = require('firebase');
 const net = require('net');
 require('firebase/firestore');
-
+// Helper that contains API Key
+const apiKey = require("./api")
+// Path of Socketfile
 const SOCKETFILE = '/tmp/unix.sock';
 
 function updateDataStructure(boxData){
@@ -22,7 +24,7 @@ function updateDataStructure(boxData){
 }
 
 firebase.initializeApp({
-	apiKey : 'AIzaSyA54rLukbO_83IgR-Q-KLkbpDAA5ZTEj6g',
+	apiKey : apiKey.getKey(),
 	projectId : 'raspi-python-test'
 });
 

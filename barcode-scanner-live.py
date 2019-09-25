@@ -11,7 +11,7 @@ import json
 import RPi.GPIO as GPIO
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(23, GPIO.OUT)
+GPIO.setup(24, GPIO.OUT)
 
 SOCKETFILE = "/tmp/unix.sock"
 
@@ -63,9 +63,9 @@ while True:
 			
 			dataDict = json.loads(data)
 			if dataDict != {}:
-				GPIO.output(23, GPIO.HIGH)
-				time.sleep(5)
-				GPIO.output(23, GPIO.LOW)
+				GPIO.output(24, GPIO.HIGH)
+				time.sleep(0.2)
+				GPIO.output(24, GPIO.LOW)
 				time.sleep(10)
 			client.close()
 		#Addition
