@@ -11,24 +11,11 @@ import json
 import RPi.GPIO as GPIO
 
 GPIO.setmode(GPIO.BCM)
+## Define Output Pins for Relays
+## Currently, the only Relay is on Pin 24
 GPIO.setup(24, GPIO.OUT)
 
 SOCKETFILE = "/tmp/unix.sock"
-
-
-	
-
-boxes = [Box(1,"secretKey"),Box(2),Box(3,"anotherKey",["secret"]),Box(4,"AmericanDreamDenial",["key"])]
-
-#TODO: Create proper Class for Boxes, that can compare Keys
-# and knows which Pin to trigger
-def checkKey(keys,key):
-	for k in keys:
-		if key == k:
-			return True
-	return False
-
-keys = ["secret","key"]
 
 vs = VideoStream(usePiCamera = True).start()
 time.sleep(2.0)
@@ -62,6 +49,8 @@ while True:
 
 			
 			dataDict = json.loads(data)
+			## TODO Check if valid Data was returned
+			## Determine the Pin for the Box that was returned
 			if dataDict != {}:
 				GPIO.output(24, GPIO.HIGH)
 				time.sleep(0.2)
