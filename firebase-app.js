@@ -42,9 +42,10 @@ db.collection('/Standort').doc('CLZ2/')
 );
 */
 
-//Funktioniert so nicht, da Firebase nur auf änderungen im eigentlichen 
-//Dokument achtet, nicht auf referenzierte
 
+// Setzt voraus, das Referenzen in Services Strings sind, den Pfad enthalten, aber ohne Company
+// TODO: nicht mehr listener setzen, sondern einmalig bei Start abrufen, da listener
+// für alle Services der Location gesetzt werden
 db.collection("/company").doc("yDOcLJggM9S9nUNt1SuQ")
 	.collection("location").doc("yti5YJIX1Cnw0Pek79en")
 	.onSnapshot({
