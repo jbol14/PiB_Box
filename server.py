@@ -17,8 +17,9 @@ server.bind(SOCKETFILE)
 print("Listening on Socket")
 
 while True:
-	## Allow 2 simultaneous Connections (Firebase App and Barcode Scanner)
-	server.listen(2)
+	## 20 zeitgleiche Verbindungen, da beim ersten aufrufen der Firebase App u.U. viele Reservierungen gesendet werden und das asynchron
+	## Daher treffen mit großer Wahrscheinlichkeit neue Reservierungen ein, bevor bestehende Verbindungen geschlossen werden
+	server.listen(20)
 	conn, addr = server.accept()
 	data = conn.recv(1024)
 	if not data:
@@ -30,31 +31,34 @@ while True:
 		if "DONE" == dataString:
 			break
 		else:
-			#print(dataString)
 			d = json.loads(dataString)
-			## Provided Data must have a type field
-			## Possible types: 
-			## UPDATE to update the internal data
-			## CHECK to check if a provided key belongs to a box
+
+			## Empfangenes Objekt muss type-Feld haben
+			## Mögliche Werte für type: 
+			## ADD die empfangenen Daten sollen der Datenstruktur hinzugefügt werden
+			## DELETE um eine Reservierung zu löschen
+			## CHECK um zu prüfen, ob ein empfangener Schlüssel zu einer Reservierung gehört
 			if d["type"] == "ADD":
 				print("Updating")
 				## Aktualisiere DATA
 				## D.h. füge ein neues Feld mit Schlüssel reservierungsId und Wert Payload zu Data hinzu
 				DATA[d["id"]] = d["payload"]
 				print("Daten\n",DATA) #Test
+			
 			elif d["type"] == "DELETE":
 				if d["id"] in DATA:
 					del DATA[d["id"]]
 					print(DATA)
+			
 			elif d["type"] == "CHECK":
 				print("Checking Key")
 				found = False
 				key = d["key"]
-				## Search for the Box that can be opened with the provided Key
+				## Box suchen, die mit dem empfangenen Schlüssel geöffnet werden kann
 				for box in DATA:
 					if DATA[box]["key"] == key:
-						## If the propper Box was found, 
-						## set found flag, send the Boxdata
+						## falls Box gefunden wurde 
+						## Setze "found"-Flag und sende die Box
 						found = True
 						print("Found matching Box")
 						reply = json.dumps(DATA[box])
@@ -62,9 +66,10 @@ while True:
 						conn.send(reply.encode("UTF-8"))
 						break
 				if not found:
-					## If no Box was found
-					## send an empty Dictionary
+					## Falls keine Box gefunden wurde
+					## Sende leeres Objekt
 					conn.send(json.dumps({}).encode("UTF-8"))
-			else:
-				print("Mist")
+	
+	## Verbindung wieder schließen
+	conn.close()
 
