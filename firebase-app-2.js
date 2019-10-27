@@ -108,18 +108,21 @@ function updateBoxServer(document){
 // Output: void
 // Verhalten: Ergänzt die Nutzdaten der Reservierung um ID und den Typ (= ADD) der Aktion am Server und schreibt Daten in Socket
 function addReservation(reservationId, reservation){
-	reservation.id = reservationId;
-	reservation.type = "ADD";
-	updateBoxServer(reservation);
+	payload = {
+		id : reservationId,
+		type : "ADD",
+		payload : reservation
+	}
+	updateBoxServer(payload);
 }
 // Input: param1 ID der zu löschenden Reservierung
 // Output: void
 // Verhalten: Erstellt ein Objekt bestehend aus ID der zu löschendne Reservierung und dem Typ (= DELETE) der Aktion am Server und schreibt in Socket
 function deleteReservation(reservationId){
-	reservation = {
+	payload = {
 		id:reservationId,
 		type: "DELETE"
 	};
-	console.log(reservation);
-	updateBoxServer(reservation);
+	console.log(payload); //Test
+	updateBoxServer(payload);
 }
