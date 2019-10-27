@@ -30,17 +30,22 @@ while True:
 		if "DONE" == dataString:
 			break
 		else:
-			print(dataString)
+			#print(dataString)
 			d = json.loads(dataString)
 			## Provided Data must have a type field
 			## Possible types: 
 			## UPDATE to update the internal data
 			## CHECK to check if a provided key belongs to a box
-			if d["type"] == "UPDATE":
+			if d["type"] == "ADD":
 				print("Updating")
-				## Update DATA
-				## That means DATA is set to the recieved Data
-				DATA = d["BOXEN"]
+				## Aktualisiere DATA
+				## D.h. füge ein neues Feld mit Schlüssel reservierungsId und Wert Payload zu Data hinzu
+				DATA[d["id"]] = d["payload"]
+				print("Daten\n",DATA) #Test
+			elif d["type"] == "DELETE":
+				if d["id"] in DATA:
+					del DATA[d["id"]]
+					print(DATA)
 			elif d["type"] == "CHECK":
 				print("Checking Key")
 				found = False
@@ -60,4 +65,6 @@ while True:
 					## If no Box was found
 					## send an empty Dictionary
 					conn.send(json.dumps({}).encode("UTF-8"))
+			else:
+				print("Mist")
 
