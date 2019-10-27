@@ -33,20 +33,34 @@ let services = locationReference.doc(location).get()
 			 services.forEach((service)=>{
 				//Listener für solche Reservierungen, deren serviceID einem Service an diesem Standort entspricht
 				db.collection("reservation").where("serviceID","==",service)
-					.onSnapshot({includeMetadataChanges: true},(doc) => {
-						doc.docs.forEach((document) => {
-							//Prüfen, ob die Reservierung gelöscht werden soll oder nicht
-							//Leider notwendig, da Listener nicht triggern wenn ein Dokument gelöscht wird
-							if(!document.data().flaggedForDeletion){
-								datastructure[document.id] = document.data()
-								console.log("DATA: ",datastructure,"\n\n")
-							}else{
-								delete datastructure[document.id]
-								console.log(datastructure)
+					.onSnapshot({includeMetadataChanges: true},(reservationCollection) => {
+						reservationCollection.docChanges().forEach((change)=>{
+							if (change.type === 'added'){
+								console.log('Neues Dokument', change.doc.id);
+								//Neuen Listener auf das Dokument setzen
+								db.collection("reservation").doc(change.doc.id)
+									.onSnapshot({includeMetadataChanges:true},(reservation)=>{
+										//console.log('Reservierung verändert!\n',reservation.data())
+										// TODO: Prüfen ob Reservierunge gültig is
+										//  D.h. resTill liegt nicht in der Vergangenheit
+										if(validReservation(reservation.data())){
+											console.log('Gültige Reservierung',reservation.id,reservation.data());
+											addReservation(reservation.id,reservation.data());
+										}
+										else{
+											console.log('Reservierung abgelaufen',reservation.id);
+											deleteReservation(reservation.id);
+										}
+										
+
+										// TODO: Änderungen an Server weiterreichen über Unix Socket
+
+									});
 							}
-							// Datenstruktur im Pythonskript über Sockets aktualisieren
-						})
-							
+							else{
+								console.log(change.type);
+							}
+						});
 					});
 			 });
 			 
@@ -59,3 +73,50 @@ let services = locationReference.doc(location).get()
 			console.log(error);
 	});
 
+//Input: Eine Reservierung
+//Output: True, falls nicht zur LÃ¶schung geflaggt oder Mietzeitraum in der Vergangenheit liegt
+//		  False, falls von user oder company zu gelÃ¶scht oder Mietzeitraum in Vergangenheit liegt
+function validReservation(reservation){
+	timeNow = firebase.firestore.Timestamp.now();
+	if(!reservation.companyHasDeleted && !reservation.userHasDeleted && timeNow < reservation.resTill){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+function updateBoxServer(document){
+	const client = net.createConnection({path: SOCKETFILE});
+	client.on('connect', ()=>{
+		console.log('Connected to Socket');
+		console.log(document.id)
+		client.end(JSON.stringify(document));
+	});
+	client.on('data', (data)=>{
+		console.log(data.toString());
+	});
+	client.on('end',()=>{
+		console.log('Disconnected from Socket');
+	});
+	client.on('error',(error)=>{
+		console.error(error,document);
+	});
+}
+
+function addReservation(reservationId, reservation){
+	console.log(reservation);
+	reservation.id = reservationId;
+	reservation.type = "ADD";
+	//console.log(reservation);
+	updateBoxServer(reservation);
+}
+
+function deleteReservation(reservationId){
+	reservation = {
+		id:reservationId,
+		type: "DELETE"
+	};
+	console.log(reservation);
+	updateBoxServer(reservation);
+}
