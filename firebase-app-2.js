@@ -34,28 +34,26 @@ let services = locationReference.doc(location).get()
 				//Listener für solche Reservierungen, deren serviceID einem Service an diesem Standort entspricht
 				db.collection("reservation").where("serviceID","==",service)
 					.onSnapshot({includeMetadataChanges: true},(reservationCollection) => {
+						// Wird immer aufgerufen wenn irgendetwas mit den Reservierungen passiert
 						reservationCollection.docChanges().forEach((change)=>{
+							// Prüfen, was passiert ist
+							// von interesse sind eigentlich nur neue Dokumente
 							if (change.type === 'added'){
-								console.log('Neues Dokument', change.doc.id);
+								console.log('Neues Dokument', change.doc.id); // Test
 								//Neuen Listener auf das Dokument setzen
 								db.collection("reservation").doc(change.doc.id)
 									.onSnapshot({includeMetadataChanges:true},(reservation)=>{
-										// TODO: Prüfen ob Reservierunge gültig is
-										//  D.h. resTill liegt nicht in der Vergangenheit
 										if(validReservation(reservation.data())){
-											console.log('Gültige Reservierung',reservation.id,reservation.data());
+											console.log('Gültige Reservierung',reservation.id,reservation.data()); //Test
 											addReservation(reservation.id,reservation.data());
 										}
 										else{
-											console.log('Reservierung abgelaufen',reservation.id);
+											console.log('Reservierung abgelaufen',reservation.id); //Test
 											deleteReservation(reservation.id);
 										}
-										
-
-										// TODO: Änderungen an Server weiterreichen über Unix Socket
-
 									});
 							}
+							//Unnötig
 							else{
 								console.log(change.type);
 							}
