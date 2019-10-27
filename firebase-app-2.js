@@ -40,7 +40,6 @@ let services = locationReference.doc(location).get()
 								//Neuen Listener auf das Dokument setzen
 								db.collection("reservation").doc(change.doc.id)
 									.onSnapshot({includeMetadataChanges:true},(reservation)=>{
-										//console.log('Reservierung verändert!\n',reservation.data())
 										// TODO: Prüfen ob Reservierunge gültig is
 										//  D.h. resTill liegt nicht in der Vergangenheit
 										if(validReservation(reservation.data())){
@@ -86,6 +85,9 @@ function validReservation(reservation){
 	}
 }
 
+// Input: Ein Reservierungsdokument aus Firebase
+// Output: void
+// Verhalten: Stellt Verbindung zum Unix-Socker her und schreibt das Dokument
 function updateBoxServer(document){
 	const client = net.createConnection({path: SOCKETFILE});
 	client.on('connect', ()=>{
@@ -104,14 +106,17 @@ function updateBoxServer(document){
 	});
 }
 
+// Input: param1: ID einer Reservierung, param2: die Nutzdaten der Reservierung
+// Output: void
+// Verhalten: Ergänzt die Nutzdaten der Reservierung um ID und den Typ (= ADD) der Aktion am Server und schreibt Daten in Socket
 function addReservation(reservationId, reservation){
-	console.log(reservation);
 	reservation.id = reservationId;
 	reservation.type = "ADD";
-	//console.log(reservation);
 	updateBoxServer(reservation);
 }
-
+// Input: param1 ID der zu löschenden Reservierung
+// Output: void
+// Verhalten: Erstellt ein Objekt bestehend aus ID der zu löschendne Reservierung und dem Typ (= DELETE) der Aktion am Server und schreibt in Socket
 function deleteReservation(reservationId){
 	reservation = {
 		id:reservationId,
