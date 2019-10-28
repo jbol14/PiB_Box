@@ -2,6 +2,9 @@ import socket
 import os
 import json
 
+## TODO DATA persistieren, d.h. bei jedem Update DATA in Datei schreiben
+## bei Startup DATA aus Datei lesen
+
 DATA = {}
 
 SOCKETFILE = "/tmp/unix.sock"
@@ -54,21 +57,30 @@ while True:
 				print("Checking Key")
 				found = False
 				key = d["key"]
-				## Box suchen, die mit dem empfangenen Schlüssel geöffnet werden kann
-				for box in DATA:
-					if DATA[box]["key"] == key:
-						## falls Box gefunden wurde 
-						## Setze "found"-Flag und sende die Box
-						found = True
-						print("Found matching Box")
-						reply = json.dumps(DATA[box])
-						print("Box Data: ", reply)
-						conn.send(reply.encode("UTF-8"))
-						break
+				print(key)
+				# Box suchen, die mit dem empfangenen Schlüssel geöffnet werden kann
+				for reservation in DATA:
+					print(DATA[reservation])
+				# Prüfen, ob Reservierung ein Key-Feld hat
+					if "key" in DATA[reservation]: 
+						#print(DATA[reservation])
+						if DATA[reservation]["key"] == key:
+							## falls Box gefunden wurde 
+							## Setze "found"-Flag und sende die Box
+							found = True
+							print("Found matching eservation")
+							reply = json.dumps(DATA[reservation])
+							print("Box Data: ", reply)
+							#conn.send(reply.encode("UTF-8"))
+							## TODO Öffnen der Box hier implementieren
+							## Dazu den Code aus Barcode-Scanner verwenden
+							break
+				
 				if not found:
 					## Falls keine Box gefunden wurde
 					## Sende leeres Objekt
-					conn.send(json.dumps({}).encode("UTF-8"))
+					#conn.send(json.dumps({}).encode("UTF-8"))
+					print("Keine passende Reservierung")
 	
 	## Verbindung wieder schließen
 	conn.close()
