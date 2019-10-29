@@ -10,6 +10,7 @@ FILEPATH = "./data.json"
 ## TODO DATA persistieren, d.h. bei jedem Update DATA in Datei schreiben
 ## bei Startup DATA aus Datei lesen
 
+## muss das wirkliche eine Funktion sein? Wird nur einmal am Anfang aufgerufen
 def readFile(path):
 	## falls Datei existiert: Inhalt auslesen und Inhalt in DATA speichern
 	try:
