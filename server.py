@@ -106,7 +106,7 @@ while True:
 							## TODO Öffnen der Box hier implementieren
 							## Dazu den Code aus Barcode-Scanner verwenden
 							break
-				
+				# Kann weg wenn server auch boxen öffnet
 				if not found:
 					## Falls keine Box gefunden wurde
 					## Sende leeres Objekt
