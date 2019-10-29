@@ -75,6 +75,7 @@ let services = locationReference.doc(location).get()
 //		  False, falls von user oder company zu gelÃ¶scht oder Mietzeitraum in Vergangenheit liegt
 function validReservation(reservation){
 	timeNow = firebase.firestore.Timestamp.now();
+	console.log(timeNow.toMillis(), reservation.resTill.toMillis())
 	if(!reservation.companyHasDeleted && !reservation.userHasDeleted && timeNow < reservation.resTill){
 		return true;
 	}
@@ -108,6 +109,8 @@ function updateBoxServer(document){
 // Output: void
 // Verhalten: Ergänzt die Nutzdaten der Reservierung um ID und den Typ (= ADD) der Aktion am Server und schreibt Daten in Socket
 function addReservation(reservationId, reservation){
+	reservation.resFrom = reservation.resFrom.toMillis(); //Neu, in Millisekunden umwandeln
+	reservation.resTill = reservation.resTill.toMillis(); //Neu, in Millisekunden umwandeln
 	payload = {
 		id : reservationId,
 		type : "ADD",
