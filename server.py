@@ -2,12 +2,40 @@ import socket
 import os
 import json
 
+## Konstanten
+DATA = {}
+SOCKETFILE = "/tmp/unix.sock"
+FILEPATH = "./data.json"
+
 ## TODO DATA persistieren, d.h. bei jedem Update DATA in Datei schreiben
 ## bei Startup DATA aus Datei lesen
 
-DATA = {}
+def readFile(path):
+	## falls Datei existiert: Inhalt auslesen und Inhalt in DATA speichern
+	try:
+		file = open(path, "rt")
+		fileContent = json.loads(file.read())
+	## Fall Datei nicht existiert, erstellen
+	except FileNotFoundError:
+		file = open(path, "x")
+		fileContent = {}
+	## Inhalt auslese und Datei schließen
+	file.close()
+	## Inhalt zurückgeben
+	return fileContent
 
-SOCKETFILE = "/tmp/unix.sock"
+## Datei schreiben
+def writeFile(path, data):
+	try:
+		file = open(FILEPATH,"w")
+		file.write(data)
+		file.close()
+	except FileNotFoundError:
+		print("Datei nicht gefunden")
+	return 
+
+DATA = readFile(FILEPATH)
+print(DATA)
 
 if os.path.exists(SOCKETFILE):
 	os.remove(SOCKETFILE)
@@ -35,7 +63,6 @@ while True:
 			break
 		else:
 			d = json.loads(dataString)
-
 			## Empfangenes Objekt muss type-Feld haben
 			## Mögliche Werte für type: 
 			## ADD die empfangenen Daten sollen der Datenstruktur hinzugefügt werden
@@ -46,12 +73,15 @@ while True:
 				## Aktualisiere DATA
 				## D.h. füge ein neues Feld mit Schlüssel reservierungsId und Wert Payload zu Data hinzu
 				DATA[d["id"]] = d["payload"]
+				writeFile(FILEPATH, json.dumps(DATA))
 				print("Daten\n",DATA) #Test
 			
 			elif d["type"] == "DELETE":
 				if d["id"] in DATA:
+					print("Deleting")
 					del DATA[d["id"]]
 					print(DATA)
+					writeFile(FILEPATH, json.dumps(DATA))
 			
 			elif d["type"] == "CHECK":
 				print("Checking Key")
@@ -71,7 +101,7 @@ while True:
 							print("Found matching eservation")
 							reply = json.dumps(DATA[reservation])
 							print("Box Data: ", reply)
-							#conn.send(reply.encode("UTF-8"))
+							#conn.send(reply.encode("UTF-8"))wird nicht gebraucht, Server soll Boxen öffnen
 							## TODO Öffnen der Box hier implementieren
 							## Dazu den Code aus Barcode-Scanner verwenden
 							break
