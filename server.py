@@ -2,9 +2,41 @@ import socket
 import os
 import json
 
+## Konstanten
 DATA = {}
-
 SOCKETFILE = "/tmp/unix.sock"
+FILEPATH = "./data.json"
+
+## TODO DATA persistieren, d.h. bei jedem Update DATA in Datei schreiben
+## bei Startup DATA aus Datei lesen
+
+## muss das wirkliche eine Funktion sein? Wird nur einmal am Anfang aufgerufen
+def readFile(path):
+	## falls Datei existiert: Inhalt auslesen und Inhalt in DATA speichern
+	try:
+		file = open(path, "rt")
+		fileContent = json.loads(file.read())
+	## Fall Datei nicht existiert, erstellen
+	except FileNotFoundError:
+		file = open(path, "x")
+		fileContent = {}
+	## Inhalt auslese und Datei schließen
+	file.close()
+	## Inhalt zurückgeben
+	return fileContent
+
+## Datei schreiben
+def writeFile(path, data):
+	try:
+		file = open(FILEPATH,"w")
+		file.write(data)
+		file.close()
+	except FileNotFoundError:
+		print("Datei nicht gefunden")
+	return 
+
+DATA = readFile(FILEPATH)
+print(DATA)
 
 if os.path.exists(SOCKETFILE):
 	os.remove(SOCKETFILE)
@@ -17,8 +49,9 @@ server.bind(SOCKETFILE)
 print("Listening on Socket")
 
 while True:
-	## Allow 2 simultaneous Connections (Firebase App and Barcode Scanner)
-	server.listen(2)
+	## 20 zeitgleiche Verbindungen, da beim ersten aufrufen der Firebase App u.U. viele Reservierungen gesendet werden und das asynchron
+	## Daher treffen mit großer Wahrscheinlichkeit neue Reservierungen ein, bevor bestehende Verbindungen geschlossen werden
+	server.listen(20)
 	conn, addr = server.accept()
 	data = conn.recv(1024)
 	if not data:
@@ -30,34 +63,56 @@ while True:
 		if "DONE" == dataString:
 			break
 		else:
-			print(dataString)
 			d = json.loads(dataString)
-			## Provided Data must have a type field
-			## Possible types: 
-			## UPDATE to update the internal data
-			## CHECK to check if a provided key belongs to a box
-			if d["type"] == "UPDATE":
+			## Empfangenes Objekt muss type-Feld haben
+			## Mögliche Werte für type: 
+			## ADD die empfangenen Daten sollen der Datenstruktur hinzugefügt werden
+			## DELETE um eine Reservierung zu löschen
+			## CHECK um zu prüfen, ob ein empfangener Schlüssel zu einer Reservierung gehört
+			if d["type"] == "ADD":
 				print("Updating")
-				## Update DATA
-				## That means DATA is set to the recieved Data
-				DATA = d["BOXEN"]
+				## Aktualisiere DATA
+				## D.h. füge ein neues Feld mit Schlüssel reservierungsId und Wert Payload zu Data hinzu
+				DATA[d["id"]] = d["payload"]
+				writeFile(FILEPATH, json.dumps(DATA))
+				print("Daten\n",DATA) #Test
+			
+			elif d["type"] == "DELETE":
+				if d["id"] in DATA:
+					print("Deleting")
+					del DATA[d["id"]]
+					print(DATA)
+					writeFile(FILEPATH, json.dumps(DATA))
+			
 			elif d["type"] == "CHECK":
 				print("Checking Key")
 				found = False
 				key = d["key"]
-				## Search for the Box that can be opened with the provided Key
-				for box in DATA:
-					if DATA[box]["key"] == key:
-						## If the propper Box was found, 
-						## set found flag, send the Boxdata
-						found = True
-						print("Found matching Box")
-						reply = json.dumps(DATA[box])
-						print("Box Data: ", reply)
-						conn.send(reply.encode("UTF-8"))
-						break
+				print(key)
+				# Box suchen, die mit dem empfangenen Schlüssel geöffnet werden kann
+				for reservation in DATA:
+					print(DATA[reservation])
+				# Prüfen, ob Reservierung ein Key-Feld hat
+					if "key" in DATA[reservation]: 
+						#print(DATA[reservation])
+						if DATA[reservation]["key"] == key:
+							## falls Box gefunden wurde 
+							## Setze "found"-Flag und sende die Box
+							found = True
+							print("Found matching eservation")
+							reply = json.dumps(DATA[reservation])
+							print("Box Data: ", reply)
+							#conn.send(reply.encode("UTF-8"))wird nicht gebraucht, Server soll Boxen öffnen
+							## TODO Öffnen der Box hier implementieren
+							## Dazu den Code aus Barcode-Scanner verwenden
+							break
+				
 				if not found:
-					## If no Box was found
-					## send an empty Dictionary
-					conn.send(json.dumps({}).encode("UTF-8"))
+					## Falls keine Box gefunden wurde
+					## Sende leeres Objekt
+					#conn.send(json.dumps({}).encode("UTF-8"))
+					print("Keine passende Reservierung")
+	
+	## Verbindung wieder schließen
+	conn.close()
 
