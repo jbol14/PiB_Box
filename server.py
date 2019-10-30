@@ -1,6 +1,7 @@
 import socket
 import os
 import json
+import datetime
 
 ## Konstanten
 DATA = {}
@@ -96,17 +97,21 @@ while True:
 					if "key" in DATA[reservation]: 
 						#print(DATA[reservation])
 						if DATA[reservation]["key"] == key:
-							## falls Box gefunden wurde 
-							## Setze "found"-Flag und sende die Box
-							found = True
-							print("Found matching eservation")
-							reply = json.dumps(DATA[reservation])
-							print("Box Data: ", reply)
+							## Prüfen, ob die Reservierung jetzt gültig ist
+							timeNow = datetime.datetime.now()
+							# timeNow.timestamp() * 1000 um auf Nanosekunden zu kommen
+							if timeNow.timestamp()*1000 >= DATA[reservation]["resFrom"] and timeNow.timestamp()*1000 <= DATA[reservation]["resTill"]:
+								## falls Box gefunden wurde 
+								## Setze "found"-Flag und sende die Box
+								found = True
+								print("Found matching eservation")
+								reply = json.dumps(DATA[reservation])
+								print("Box Data: ", reply)
 							#conn.send(reply.encode("UTF-8"))wird nicht gebraucht, Server soll Boxen öffnen
 							## TODO Öffnen der Box hier implementieren
 							## Dazu den Code aus Barcode-Scanner verwenden
 							break
-				
+				# Kann weg wenn server auch boxen öffnet
 				if not found:
 					## Falls keine Box gefunden wurde
 					## Sende leeres Objekt
@@ -116,3 +121,6 @@ while True:
 	## Verbindung wieder schließen
 	conn.close()
 
+# 1572362919.782624
+# 1573977600000
+# 1572247800000
