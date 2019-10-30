@@ -105,11 +105,27 @@ while True:
 								## Setze "found"-Flag und sende die Box
 								found = True
 								print("Found matching eservation")
-								reply = json.dumps(DATA[reservation])
-								print("Box Data: ", reply)
-							#conn.send(reply.encode("UTF-8"))wird nicht gebraucht, Server soll Boxen öffnen
-							## TODO Öffnen der Box hier implementieren
-							## Dazu den Code aus Barcode-Scanner verwenden
+								
+								reply = json.dumps(DATA[reservation]) #Test
+								print("Box Data: ", reply) #Test
+							
+								## TODO Öffnen der Box hier implementieren
+								## Dazu den Code aus Barcode-Scanner verwenden
+
+								## Prüfen ob Counter-Feld existiert
+								if "counter" in DATA[reservation]:
+									DATA[reservation]["counter"] = DATA[reservation]["counter"] + 1
+								else:
+									DATA[reservation]["counter"] = 1
+
+								## Firebase updaten
+								LOGSOCK = "./log.sock"
+								if os.path.exists(LOGSOCK):
+									client = socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+									client.connect(LOGSOCK)
+									payload = '{"reservationId" : "' + reservation +'", "counter" : "' + str(DATA[reservation]["counter"]) + '"}'
+									client.send(payload.encode("UTF-8"))
+
 							break
 				# Kann weg wenn server auch boxen öffnet
 				if not found:
