@@ -123,7 +123,7 @@ while True:
 								if os.path.exists(LOGSOCK):
 									client = socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
 									client.connect(LOGSOCK)
-									payload = '{"reservationId" : "' + reservation +'", "counter" : "' + str(DATA[reservation]["counter"]) + '"}'
+									payload = '{"reservationId" : "' + reservation +'", "counter" : ' + str(DATA[reservation]["counter"]) + '}'
 									client.send(payload.encode("UTF-8"))
 
 							break
