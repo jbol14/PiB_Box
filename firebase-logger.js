@@ -1,3 +1,5 @@
+// TODO: vernünftig beenden, d.h Socket-File entfernen etc.
+
 // Imports
 const firebase = require('firebase');
 const net = require('net');
