@@ -94,7 +94,7 @@ while True:
 				# Box suchen, die mit dem empfangenen Schlüssel geöffnet werden kann
 				for reservation in DATA:
 					#print(DATA[reservation]) # test
-				# Prüfen, ob Reservierung ein Key-Feld hat
+					# Prüfen, ob Reservierung ein Key-Feld hat
 					if "key" in DATA[reservation]: 
 						#print(DATA[reservation])
 						if DATA[reservation]["key"] == key:
