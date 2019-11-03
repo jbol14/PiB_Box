@@ -1,6 +1,7 @@
 // TODO: vernünftig beenden, d.h Socket-File entfernen etc.
 
 // Imports
+const fs = require('fs');
 const firebase = require('firebase');
 const net = require('net');
 require('firebase/firestore');
@@ -21,7 +22,13 @@ const db = firebase.firestore();
 const locationReference = db.collection('/company/yDOcLJggM9S9nUNt1SuQ/location');
 
 let socketServer = net.createServer();
-socketServer.listen("./log.sock", ()=>{
+
+//Falls der Socket bereits existiert: entfernen
+if(fs.existsSync(SOCKETFILE)){
+    fs.unlinkSync(SOCKETFILE)
+} 
+
+socketServer.listen(SOCKETFILE, ()=>{
     console.log("Listening");
 });
 socketServer.on("connection", (s)=>{
