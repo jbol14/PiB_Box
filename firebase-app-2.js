@@ -16,7 +16,7 @@ firebase.initializeApp({
 
 const db = firebase.firestore();
 
-let datastructure = {}
+let datastructure = {};
 
 // Alle Services, die auf der Location registriert sind als Array holen
 let locationReference = db.collection('/company/yDOcLJggM9S9nUNt1SuQ/location');
@@ -42,8 +42,9 @@ let services = locationReference.doc(location).get()
 								console.log('Neues Dokument', change.doc.id); // Test
 								//Neuen Listener auf das Dokument setzen
 								db.collection("reservation").doc(change.doc.id)
-									.onSnapshot({includeMetadataChanges:true},(reservation)=>{
-										if(validReservation(reservation.data())){
+									.onSnapshot({includeMetadataChanges:false},(reservation)=>{
+										console.log("data: ",reservation.data());
+										if(reservation.data() && validReservation(reservation.data())){
 											console.log('Gültige Reservierung',reservation.id,reservation.data()); //Test
 											addReservation(reservation.id,reservation.data());
 										}
@@ -55,7 +56,7 @@ let services = locationReference.doc(location).get()
 							}
 							//Unnötig
 							else{
-								console.log(change.type);
+								console.log("change type: ", change.type);
 							}
 						});
 					});
