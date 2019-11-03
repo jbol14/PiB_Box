@@ -44,7 +44,13 @@ socketServer.on("connection", (s)=>{
         else{
             writeBack(js.reservationId,js.counter)
         }
-    })
+    });
+    s.on("end", () => {
+        console.log("connection terminated")
+    });
+    s.on("error", (error)=>{
+        console.error(error);
+    });
     console.log("Connection");
 });
 socketServer.on("data", (data)=>{
