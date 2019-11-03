@@ -72,28 +72,28 @@ while True:
 			## DELETE um eine Reservierung zu löschen
 			## CHECK um zu prüfen, ob ein empfangener Schlüssel zu einer Reservierung gehört
 			if d["type"] == "ADD":
-				print("Updating")
+				print("Updating reservation ", d["id"])
 				## Aktualisiere DATA
 				## D.h. füge ein neues Feld mit Schlüssel reservierungsId und Wert Payload zu Data hinzu
 				DATA[d["id"]] = d["payload"]
 				writeFile(FILEPATH, json.dumps(DATA))
-				print("Daten\n",DATA) #Test
+				#print("Daten\n",DATA) #Test
 			
 			elif d["type"] == "DELETE":
 				if d["id"] in DATA:
-					print("Deleting")
+					print("Deleting reservation ", d["id"])
 					del DATA[d["id"]]
-					print(DATA)
+					#print(DATA)
 					writeFile(FILEPATH, json.dumps(DATA))
 			
 			elif d["type"] == "CHECK":
 				print("Checking Key")
 				found = False
 				key = d["key"]
-				print(key)
+				#print(key) # test
 				# Box suchen, die mit dem empfangenen Schlüssel geöffnet werden kann
 				for reservation in DATA:
-					print(DATA[reservation])
+					#print(DATA[reservation]) # test
 				# Prüfen, ob Reservierung ein Key-Feld hat
 					if "key" in DATA[reservation]: 
 						#print(DATA[reservation])
@@ -105,10 +105,10 @@ while True:
 								## falls Box gefunden wurde 
 								## Setze "found"-Flag und sende die Box
 								found = True
-								print("Found matching eservation")
+								print("Found matching reservation ", reservation)
 								
 								reply = json.dumps(DATA[reservation]) #Test
-								print("Box Data: ", reply) #Test
+								#print("Box Data: ", reply) #Test
 							
 								## TODO Öffnen der Box hier implementieren
 								## Dazu den Code aus Barcode-Scanner verwenden
@@ -126,6 +126,7 @@ while True:
 									payload = '{"reservationId" : "' + reservation +'", "counter" : ' + str(DATA[reservation]["counter"]) + '}'
 									print("sending reply ", payload)
 									client.send(payload.encode("UTF-8"))
+									client.close()
 
 							break
 				# Kann weg wenn server auch boxen öffnet
