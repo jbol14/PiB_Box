@@ -6,6 +6,7 @@ import datetime
 ## Konstanten
 DATA = {}
 SOCKETFILE = "/tmp/unix.sock"
+LOGSOCK = "/tmp/firebase-logger.sock"
 FILEPATH = "./data.json"
 
 ## TODO DATA persistieren, d.h. bei jedem Update DATA in Datei schreiben
@@ -119,11 +120,11 @@ while True:
 									DATA[reservation]["counter"] = 1
 
 								## Firebase updaten
-								LOGSOCK = "./log.sock"
 								if os.path.exists(LOGSOCK):
 									client = socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
 									client.connect(LOGSOCK)
 									payload = '{"reservationId" : "' + reservation +'", "counter" : ' + str(DATA[reservation]["counter"]) + '}'
+									print("sending reply ", payload)
 									client.send(payload.encode("UTF-8"))
 
 							break
@@ -136,7 +137,3 @@ while True:
 	
 	## Verbindung wieder schließen
 	conn.close()
-
-# 1572362919.782624
-# 1573977600000
-# 1572247800000
