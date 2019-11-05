@@ -6,6 +6,7 @@ import datetime
 ## Konstanten
 DATA = {}
 SOCKETFILE = "/tmp/unix.sock"
+LOGSOCK = "/tmp/firebase-logger.sock"
 FILEPATH = "./data.json"
 
 ## TODO DATA persistieren, d.h. bei jedem Update DATA in Datei schreiben
@@ -71,29 +72,29 @@ while True:
 			## DELETE um eine Reservierung zu löschen
 			## CHECK um zu prüfen, ob ein empfangener Schlüssel zu einer Reservierung gehört
 			if d["type"] == "ADD":
-				print("Updating")
+				print("Updating reservation ", d["id"])
 				## Aktualisiere DATA
 				## D.h. füge ein neues Feld mit Schlüssel reservierungsId und Wert Payload zu Data hinzu
 				DATA[d["id"]] = d["payload"]
 				writeFile(FILEPATH, json.dumps(DATA))
-				print("Daten\n",DATA) #Test
+				#print("Daten\n",DATA) #Test
 			
 			elif d["type"] == "DELETE":
 				if d["id"] in DATA:
-					print("Deleting")
+					print("Deleting reservation ", d["id"])
 					del DATA[d["id"]]
-					print(DATA)
+					#print(DATA)
 					writeFile(FILEPATH, json.dumps(DATA))
 			
 			elif d["type"] == "CHECK":
 				print("Checking Key")
 				found = False
 				key = d["key"]
-				print(key)
+				#print(key) # test
 				# Box suchen, die mit dem empfangenen Schlüssel geöffnet werden kann
 				for reservation in DATA:
-					print(DATA[reservation])
-				# Prüfen, ob Reservierung ein Key-Feld hat
+					#print(DATA[reservation]) # test
+					# Prüfen, ob Reservierung ein Key-Feld hat
 					if "key" in DATA[reservation]: 
 						#print(DATA[reservation])
 						if DATA[reservation]["key"] == key:
@@ -104,12 +105,29 @@ while True:
 								## falls Box gefunden wurde 
 								## Setze "found"-Flag und sende die Box
 								found = True
-								print("Found matching eservation")
-								reply = json.dumps(DATA[reservation])
-								print("Box Data: ", reply)
-							#conn.send(reply.encode("UTF-8"))wird nicht gebraucht, Server soll Boxen öffnen
-							## TODO Öffnen der Box hier implementieren
-							## Dazu den Code aus Barcode-Scanner verwenden
+								print("Found matching reservation ", reservation)
+								
+								reply = json.dumps(DATA[reservation]) #Test
+								#print("Box Data: ", reply) #Test
+							
+								## TODO Öffnen der Box hier implementieren
+								## Dazu den Code aus Barcode-Scanner verwenden
+
+								## Prüfen ob Counter-Feld existiert
+								if "counter" in DATA[reservation]:
+									DATA[reservation]["counter"] = DATA[reservation]["counter"] + 1
+								else:
+									DATA[reservation]["counter"] = 1
+
+								## Firebase updaten
+								if os.path.exists(LOGSOCK):
+									client = socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+									client.connect(LOGSOCK)
+									payload = '{"reservationId" : "' + reservation +'", "counter" : ' + str(DATA[reservation]["counter"]) + '}'
+									print("sending reply ", payload)
+									client.send(payload.encode("UTF-8"))
+									client.close()
+
 							break
 				# Kann weg wenn server auch boxen öffnet
 				if not found:
@@ -120,7 +138,3 @@ while True:
 	
 	## Verbindung wieder schließen
 	conn.close()
-
-# 1572362919.782624
-# 1573977600000
-# 1572247800000
