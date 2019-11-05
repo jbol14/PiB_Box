@@ -2,12 +2,17 @@ import socket
 import os
 import json
 import datetime
+import time
+#import RPi.GPIO as GPIO
 
 ## Konstanten
 DATA = {}
 SOCKETFILE = "/tmp/unix.sock"
 LOGSOCK = "/tmp/firebase-logger.sock"
 FILEPATH = "./data.json"
+
+#GPIO.setmode(GPIO.BCM)
+#GPIO.setup(24, GPIO.OUT)
 
 ## TODO DATA persistieren, d.h. bei jedem Update DATA in Datei schreiben
 ## bei Startup DATA aus Datei lesen
@@ -112,6 +117,10 @@ while True:
 							
 								## TODO Öffnen der Box hier implementieren
 								## Dazu den Code aus Barcode-Scanner verwenden
+								# GPIO.output(24, GPIO.HIGH)
+								# sleep(0.2)
+								# GPIO.output(24, GPIO.low)
+
 
 								## Prüfen ob Counter-Feld existiert
 								if "counter" in DATA[reservation]:
