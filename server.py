@@ -14,6 +14,20 @@ FILEPATH = "./data.json"
 #GPIO.setmode(GPIO.BCM)
 #GPIO.setup(24, GPIO.OUT)
 
+def used(user):
+	#now = int(datetime.datetime.now().timestamp()) * 1000
+	#used = reservation["used"]
+	payload = {"whoUsed" : user}
+	# if used[0] == {}:
+	# 	used[0] = payload
+	# 	print("empty" + str(used))
+	# else:
+	#used.append(payload)
+	#print("not empty" + str(used))
+	
+	return json.dumps(payload)
+
+
 ## TODO DATA persistieren, d.h. bei jedem Update DATA in Datei schreiben
 ## bei Startup DATA aus Datei lesen
 
@@ -132,7 +146,8 @@ while True:
 								if os.path.exists(LOGSOCK):
 									client = socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
 									client.connect(LOGSOCK)
-									payload = '{"reservationId" : "' + reservation +'", "counter" : ' + str(DATA[reservation]["counter"]) + '}'
+									print(type(DATA[reservation]))
+									payload = '{"reservationId" : "' + reservation +'", "used" : ' + used("Ich") + '}'
 									print("sending reply ", payload)
 									client.send(payload.encode("UTF-8"))
 									client.close()
