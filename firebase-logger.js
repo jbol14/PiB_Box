@@ -38,11 +38,22 @@ socketServer.on("connection", (s)=>{
         console.log(str);
         js = JSON.parse(str);
         console.log(js);
-        if (!js.reservationId || !js.counter){
+        if (!js.reservationId || !js.used){
             console.log("fehlerhaftes Objekt");
         }
         else{
-            writeBack(js.reservationId,js.counter)
+            // numericalTimestamp = Date.now();
+            // arrayLength = js.used.length;
+            // js.used[arrayLength-1].whenUsed = firebase.firestore.Timestamp.now();
+
+            // console.log(numericalTimestamp);
+            // console.log(typeof js.used.whenUsed)
+
+            // console.log(typeof js.used.whenUsed)
+            js.used.whenUsed = firebase.firestore.Timestamp.now();
+            writeBack(js.reservationId,js.used)
+
+
         }
     });
     s.on("end", () => {
@@ -59,7 +70,8 @@ socketServer.on("data", (data)=>{
 
 // Funktion zum zuückschreiben des erhöhten Zählers
 function writeBack(reservationId, serviceCounter){
-    db.collection('reservation').doc(reservationId).update({counter : serviceCounter})
+    console.log(serviceCounter);
+    db.collection('reservation').doc(reservationId).update({used : /*FieldValue.arrayUnion(serviceCounter*/ firebase.firestore.FieldValue.arrayUnion(serviceCounter)})
 }
 
 //writeBack('cRHI274cWpEej4dAIJR8',2) // Testen, funktioniert
