@@ -15,15 +15,7 @@ FILEPATH = "./data.json"
 #GPIO.setup(24, GPIO.OUT)
 
 def used(user):
-	#now = int(datetime.datetime.now().timestamp()) * 1000
-	#used = reservation["used"]
 	payload = {"whoUsed" : user}
-	# if used[0] == {}:
-	# 	used[0] = payload
-	# 	print("empty" + str(used))
-	# else:
-	#used.append(payload)
-	#print("not empty" + str(used))
 	
 	return json.dumps(payload)
 
