@@ -6,3 +6,4 @@ data.json
 .vscode
 reservation.json
 shares.json
+__pycache__
