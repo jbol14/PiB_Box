@@ -71,7 +71,7 @@ socketServer.on("data", (data)=>{
 // Funktion zum zuückschreiben des erhöhten Zählers
 function writeBack(reservationId, serviceCounter){
     console.log(serviceCounter);
-    db.collection('reservation').doc(reservationId).update({used : /*FieldValue.arrayUnion(serviceCounter*/ firebase.firestore.FieldValue.arrayUnion(serviceCounter)})
+    db.collection('reservation').doc(reservationId).update({used : firebase.firestore.FieldValue.arrayUnion(serviceCounter)})
 }
 
 //writeBack('cRHI274cWpEej4dAIJR8',2) // Testen, funktioniert
