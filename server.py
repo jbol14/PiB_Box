@@ -98,6 +98,7 @@ while True:
 					writeFile(FILEPATH, json.dumps(DATA))
 			
 			elif d["type"] == "CHECK":
+				## TODO : Übergebenen String parsen, userId extrahieren
 				print("Checking Key")
 				found = False
 				key = d["key"]
