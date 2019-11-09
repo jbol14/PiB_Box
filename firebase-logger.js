@@ -73,8 +73,3 @@ function writeBack(reservationId, serviceCounter){
     console.log(serviceCounter);
     db.collection('reservation').doc(reservationId).update({used : firebase.firestore.FieldValue.arrayUnion(serviceCounter)})
 }
-
-//writeBack('cRHI274cWpEej4dAIJR8',2) // Testen, funktioniert
-
-// TODO: Socket implementieren
-// TODO: Bei empfangenen Daten auf Socket writeBack Funktion ausführen
