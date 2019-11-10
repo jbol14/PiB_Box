@@ -47,6 +47,8 @@ class ReservationController:
         self.reservations = self.readJsonFile(self.RESERVATIONPATH)
         self.shares = self.readJsonFile(self.SHAREPATH)
     
+    ## Methoden
+    ''' Öffnet die Box, die zu der Reservierung gehört '''
     def openBox(self, reservationId):
         #GPIO.output(24, GPIO.HIGH)
         #sleep(0.2)
@@ -54,11 +56,13 @@ class ReservationController:
         print("Box Opened")
 
     ## Updating
+    ''' Aktualisiert die Reservierungen '''
     def updateReservations(self, reservation):
         #print("Updating Reservation", reservation) ## Test
         self.reservations[reservation["id"]] = reservation["payload"]
         self.writeJsonFile(self.RESERVATIONPATH, json.dumps(self.reservations))
     
+    ''' Aktualisiert die Shares '''
     def updateShares(self, share):
         #print("Updating Share") ## Test
         self.shares[share["id"]] = share["payload"]
@@ -66,6 +70,7 @@ class ReservationController:
 
 
     ## Deleting
+    ''' Löscht die Reservierung mit der Übergebenen ID und alle Shares zu dieser Reservierung '''
     def deleteReservation(self, reservationId):
         print("Delete Reservation ", reservationId)
         ## Reservierung aus self.reservations entfernen
@@ -77,16 +82,13 @@ class ReservationController:
         for share in self.shares:
             if self.shares[share]["reservationID"] == reservationId:
                 listOfShareIds.append(share)
-                #del self.shares[share]
-        
-        print(listOfShareIds)
-        
+
         for ids in listOfShareIds:
-            print(ids, self.shares[ids])
             del self.shares[ids]
 
         self.writeJsonFile(self.SHAREPATH, json.dumps(self.shares))
 
+    ''' Löscht einen einzelnen Share '''
     def deleteShare(self, shareId):
         if shareId in self.shares:
             del self.shares[shareId]
