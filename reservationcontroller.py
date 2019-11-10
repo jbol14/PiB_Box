@@ -72,10 +72,19 @@ class ReservationController:
         if reservationId in self.reservations:
             del self.reservations[reservationId]
             self.writeJsonFile(self.RESERVATIONPATH, json.dumps(self.reservations))
-        ## Freigaben für diese Reservierung Löschen        
+        ## Freigaben für diese Reservierung Löschen
+        listOfShareIds = []        
         for share in self.shares:
-            if share["reservationID"] == reservationId:
-                del share
+            if self.shares[share]["reservationID"] == reservationId:
+                listOfShareIds.append(share)
+                #del self.shares[share]
+        
+        print(listOfShareIds)
+        
+        for ids in listOfShareIds:
+            print(ids, self.shares[ids])
+            del self.shares[ids]
+
         self.writeJsonFile(self.SHAREPATH, json.dumps(self.shares))
 
     def deleteShare(self, shareId):
