@@ -31,20 +31,35 @@ let services = locationReference.doc(location).get()
 			//Für jeden Service/Box die zugehörigen Reservierungen holen
 			//und Listener darauf setzen
 			 services.forEach((service)=>{
+				
 				//Listener für solche Reservierungen, deren serviceID einem Service an diesem Standort entspricht
 				db.collection("reservation").where("serviceID","==",service)
 					.onSnapshot({includeMetadataChanges: true},(reservationCollection) => {
+						
 						// Wird immer aufgerufen wenn irgendetwas mit den Reservierungen passiert
 						reservationCollection.docChanges().forEach((change)=>{
 							// Prüfen, was passiert ist
 							// von interesse sind eigentlich nur neue Dokumente
 							if (change.type === 'added'){
 								console.log('Neues Dokument', change.doc.id); // Test
+								
 								//Neuen Listener auf das Dokument setzen
 								db.collection("reservation").doc(change.doc.id)
 									.onSnapshot({includeMetadataChanges:false},(reservation)=>{
-										console.log("data: ",reservation.data());
+										console.log("data: ",reservation.data()); //Test
 										if(reservation.data() && validReservation(reservation.data())){
+											
+											//Listener für Shares setzen
+											db.collection('sharing').where('reservationID','==', reservation.id)
+											.onSnapshot({includeMetadataChanges : true}, (shares)=>{
+												shares.docChanges().forEach((change)=>{
+													if(change.type == 'added'){
+														addShare(change.doc.id, change.doc.data())
+													}
+												});
+											});
+
+
 											console.log('Gültige Reservierung',reservation.id,reservation.data()); //Test
 											addReservation(reservation.id,reservation.data());
 										}
@@ -114,7 +129,7 @@ function addReservation(reservationId, reservation){
 	reservation.resTill = reservation.resTill.toMillis(); //Neu, in Millisekunden umwandeln
 	payload = {
 		id : reservationId,
-		type : "ADD",
+		type : "ADD_RESERVATION",
 		payload : reservation
 	}
 	updateBoxServer(payload);
@@ -129,4 +144,14 @@ function deleteReservation(reservationId){
 	};
 	console.log(payload); //Test
 	updateBoxServer(payload);
+}
+
+function addShare(shareId, shareData){
+	payload = {
+		id : shareId,
+		type : "ADD_SHARE",
+		payload : shareData
+	}
+	console.log(payload) //Test
+	updateBoxServer(payload)
 }
