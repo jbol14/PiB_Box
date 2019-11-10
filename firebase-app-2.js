@@ -53,7 +53,7 @@ let services = locationReference.doc(location).get()
 											db.collection('sharing').where('reservationID','==', reservation.id)
 											.onSnapshot({includeMetadataChanges : true}, (shares)=>{
 												shares.docChanges().forEach((change)=>{
-													if(change.type == 'added'){
+													if(change.type === 'added'){
 														addShare(change.doc.id, change.doc.data())
 													}
 												});
