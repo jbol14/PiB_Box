@@ -60,7 +60,7 @@ class ReservationController:
         self.writeJsonFile(self.RESERVATIONPATH, json.dumps(self.reservations))
     
     def updateShares(self, share):
-        print("Updating Share") ## Test
+        #print("Updating Share") ## Test
         self.shares[share["id"]] = share["payload"]
         self.writeJsonFile(self.SHAREPATH, json.dumps(self.shares))
 
