@@ -34,8 +34,11 @@ while True:
 
         jsonData = json.loads(dataString)
 
-        if jsonData["type"] == "ADD":
+        if jsonData["type"] == "ADD_RESERVATION":
             reservationController.updateReservations(jsonData)
+        
+        elif jsonData["type"] == "ADD_SHARE":
+            reservationController.updateShares(jsonData)
         
         elif jsonData["type"] == "DELETE":
             reservationController.deleteReservation(jsonData["id"])
