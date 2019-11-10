@@ -20,71 +20,72 @@ let datastructure = {};
 
 // Alle Services, die auf der Location registriert sind als Array holen
 let locationReference = db.collection('/company/yDOcLJggM9S9nUNt1SuQ/location');
-let services = locationReference.doc(location).get()
-	.then(function(doc){
-		if(doc.exists){
-			//Debug
-			//console.log('Document Data: ',doc.data().Services.length)
-			let services = doc.data().Services;
-			//services.forEach(service => console.log(service));
+let services = locationReference.doc(location).get();
+
+services.then(function(doc){
+	if(doc.exists){
+		//Debug
+		//console.log('Document Data: ',doc.data().Services.length)
+		let services = doc.data().Services;
+		//services.forEach(service => console.log(service));
 			
-			//Für jeden Service/Box die zugehörigen Reservierungen holen
-			//und Listener darauf setzen
-			 services.forEach((service)=>{
+		//Für jeden Service/Box die zugehörigen Reservierungen holen
+		//und Listener darauf setzen
+		services.forEach((service)=>{
 				
-				//Listener für solche Reservierungen, deren serviceID einem Service an diesem Standort entspricht
-				db.collection("reservation").where("serviceID","==",service)
-					.onSnapshot({includeMetadataChanges: true},(reservationCollection) => {
+			//Listener für solche Reservierungen, deren serviceID einem Service an diesem Standort entspricht
+			db.collection("reservation").where("serviceID","==",service)
+			.onSnapshot({includeMetadataChanges: true},(reservationCollection) => {
 						
-						// Wird immer aufgerufen wenn irgendetwas mit den Reservierungen passiert
-						reservationCollection.docChanges().forEach((change)=>{
-							// Prüfen, was passiert ist
-							// von interesse sind eigentlich nur neue Dokumente
-							if (change.type === 'added'){
-								console.log('Neues Dokument', change.doc.id); // Test
+				// Wird immer aufgerufen wenn irgendetwas mit den Reservierungen passiert
+				reservationCollection.docChanges().forEach((change)=>{
+					// Prüfen, was passiert ist
+					// von interesse sind eigentlich nur neue Dokumente
+					if (change.type === 'added'){
+						console.log('Neues Dokument', change.doc.id); // Test
 								
-								//Neuen Listener auf das Dokument setzen
-								db.collection("reservation").doc(change.doc.id)
-									.onSnapshot({includeMetadataChanges:false},(reservation)=>{
-										console.log("data: ",reservation.data()); //Test
-										if(reservation.data() && validReservation(reservation.data())){
-											
-											//Listener für Shares setzen
-											db.collection('sharing').where('reservationID','==', reservation.id)
-											.onSnapshot({includeMetadataChanges : true}, (shares)=>{
-												shares.docChanges().forEach((change)=>{
-													if(change.type === 'added'){
-														addShare(change.doc.id, change.doc.data())
-													}
-												});
-											});
-
-
-											console.log('Gültige Reservierung',reservation.id,reservation.data()); //Test
-											addReservation(reservation.id,reservation.data());
-										}
-										else{
-											console.log('Reservierung abgelaufen',reservation.id); //Test
-											deleteReservation(reservation.id);
+						//Neuen Listener auf das Dokument setzen
+						db.collection("reservation").doc(change.doc.id)
+						.onSnapshot({includeMetadataChanges:false},(reservation)=>{
+							console.log("data: ",reservation.data()); //Test
+							if(reservation.data() && validReservation(reservation.data())){
+										
+								//Listener für Shares setzen
+								db.collection('sharing').where('reservationID','==', reservation.id)
+								.onSnapshot({includeMetadataChanges : true}, (shares)=>{
+									shares.docChanges().forEach((change)=>{
+										if(change.type === 'added'){
+											addShare(change.doc.id, change.doc.data())
 										}
 									});
+								});
+
+
+								console.log('Gültige Reservierung',reservation.id,reservation.data()); //Test
+								addReservation(reservation.id,reservation.data());
 							}
-							//Unnötig
 							else{
-								console.log("change type: ", change.type);
+								console.log('Reservierung abgelaufen',reservation.id); //Test
+								deleteReservation(reservation.id);
 							}
 						});
-					});
-			 });
+					}
+							//Unnötig
+					else{
+						console.log("change type: ", change.type);
+					}
+				});
+			});
+		});
 			 
-		}
-		else{
-			console.log('No such Document')
-		}
-	})
-	.catch(function(error){
-			console.log(error);
-	});
+	}
+	else{
+		console.log('No such Document')
+	}
+})
+.catch(function(error){
+	console.log(error);
+});
 
 //Input: Eine Reservierung
 //Output: True, falls nicht zur LÃ¶schung geflaggt oder Mietzeitraum in der Vergangenheit liegt
@@ -123,7 +124,7 @@ function updateBoxServer(document){
 
 // Input: param1: ID einer Reservierung, param2: die Nutzdaten der Reservierung
 // Output: void
-// Verhalten: Ergänzt die Nutzdaten der Reservierung um ID und den Typ (= ADD) der Aktion am Server und schreibt Daten in Socket
+// Verhalten: Ergänzt die Nutzdaten der Reservierung um ID und den Typ (= ADD_RESERVATION) der Aktion am Server und schreibt Daten in Socket
 function addReservation(reservationId, reservation){
 	reservation.resFrom = reservation.resFrom.toMillis(); //Neu, in Millisekunden umwandeln
 	reservation.resTill = reservation.resTill.toMillis(); //Neu, in Millisekunden umwandeln
@@ -134,6 +135,20 @@ function addReservation(reservationId, reservation){
 	}
 	updateBoxServer(payload);
 }
+
+// Input: shareId: ID eines shares, shareData: Daten des shares
+//Output: void
+//Verhalten: Ergänzt Nutzdaten eines Shares um dessen ID und den Typ (=ADD_SHARE) der Aktion am Server und schreibt Daten in Socket
+function addShare(shareId, shareData){
+	payload = {
+		id : shareId,
+		type : "ADD_SHARE",
+		payload : shareData
+	}
+	console.log(payload) //Test
+	updateBoxServer(payload)
+}
+
 // Input: param1 ID der zu löschenden Reservierung
 // Output: void
 // Verhalten: Erstellt ein Objekt bestehend aus ID der zu löschendne Reservierung und dem Typ (= DELETE) der Aktion am Server und schreibt in Socket
@@ -144,14 +159,4 @@ function deleteReservation(reservationId){
 	};
 	console.log(payload); //Test
 	updateBoxServer(payload);
-}
-
-function addShare(shareId, shareData){
-	payload = {
-		id : shareId,
-		type : "ADD_SHARE",
-		payload : shareData
-	}
-	console.log(payload) //Test
-	updateBoxServer(payload)
 }
