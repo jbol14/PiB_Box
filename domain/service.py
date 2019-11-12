@@ -1,5 +1,6 @@
 #import RPi.GPIO as GPIO
 #import time
+import json
 
 class Service:
     def __init__(self,id,category, gpioPin):
@@ -22,3 +23,13 @@ class Service:
 
     def getGpioPin(self):
         return self.gpioPin
+    
+    def toDict(self):
+        return {
+            "id" : self.id,
+            "category" : self.category,
+            "gpioPin" : self.gpioPin
+            }
+    
+    def toJson(self):
+        return json.dumps(self.toDict())

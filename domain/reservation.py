@@ -9,8 +9,7 @@ class Reservation:
 
     ## Konstruktor
     def __init__(self, id, reservationJson, service):
-        print(reservationJson["serviceID"])
-         #reservationDict = json.loads(reservationJson)
+        #print(reservationJson["serviceID"]) # Test
         self.id = id
         self.serviceID = reservationJson["serviceID"]
         self.resFrom = reservationJson["resFrom"]
@@ -43,3 +42,20 @@ class Reservation:
     def useReservation(self):
         self.service.open()
         self.logUsage()
+    
+    def toDict(self):
+        return {
+            "id" : self.id,
+            "serviceID" : self.serviceID,
+            "resFrom" : self.resFrom,
+            "resTill" : self.resTill,
+            #"resTime" : self.resTime,
+            "userID" : self.userID,
+            "userHasDeleted" : self.userHasDeleted,
+            "companyHasDeleted" : self.companyHasDeleted,
+            "used" : self.used,
+            "qrCode" : self.qrCode
+        }
+    
+    def toJson(self):
+        return json.dumps(self.toDict())

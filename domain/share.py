@@ -32,3 +32,15 @@ class Share:
     def useShare(self):
         self.reservation.service.open()
         self.logUsage()
+
+    def toDict(self):
+        return {
+            "id" : self.id,
+            "qrCode" : self.qrCode,
+            "toUser" : self.toUser,
+            "fromUser" : self.fromUser,
+            "resrvationID" : self.reservationID
+        }
+    
+    def toJson(self):
+        return json.dumps(self.toDict())
