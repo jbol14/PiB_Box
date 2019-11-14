@@ -3,7 +3,7 @@
 import json
 
 class Service:
-    def __init__(self,id,category, gpioPin):
+    def __init__(self,id,category, gpioPin=24):
         ## GPIO Setup
         #GPIO.setmode(GPIO.BCM)
         #GPIO.setup(gpioPin, GPIO.OUT)
