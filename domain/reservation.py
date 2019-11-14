@@ -11,17 +11,17 @@ class Reservation:
     def __init__(self, id, reservationJson, service):
         #print(reservationJson["serviceID"]) # Test
         self.id = id
-        self.serviceID = reservationJson["serviceID"]
+        self.serviceID = reservationJson["serviceID"] #Nicht sicher ob das gebraucht wird wenn Service als Attribut da ist
         self.resFrom = reservationJson["resFrom"]
         self.resTill = reservationJson["resTill"]
-        #self.resTime = reservationJson["resTime"]
+        #self.resTime = reservationJson["resTime"] # Nicht nötig
         self.userID = reservationJson["userID"]
         self.service = service
         self.userHasDeleted = reservationJson["userHasDeleted"]
         self.companyHasDeleted = reservationJson["companyHasDeleted"]
         #self.reasonWhyDeleted = reservationJsonreason["WhyDeleted"]
-        self.used = reservationJson["used"]
-        self.qrCode = reservationJson["key"]
+        self.used = reservationJson["used"] # Nicht nötig
+        self.qrCode = reservationJson["qrCode"]
     
     ## Methoden
     def logUsage(self):
@@ -29,8 +29,6 @@ class Reservation:
 
             used = {"whoUsed" : self.userID}
             payload = json.dumps({"reservationId" : self.id, "used" : used})
-
-            print(payload) ## Test
 
             client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
             client.connect(self.LOGSOCKETPATH)
