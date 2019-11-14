@@ -24,14 +24,19 @@ let services = locationReference.doc(location).get();
 
 services.then(function(doc){
 	if(doc.exists){
-		//Debug
-		//console.log('Document Data: ',doc.data().Services.length)
+		
 		let services = doc.data().Services;
-		//services.forEach(service => console.log(service));
 			
 		//Für jeden Service/Box die zugehörigen Reservierungen holen
 		//und Listener darauf setzen
 		services.forEach((service)=>{
+
+			//Listener für Service setzen
+			db.collection('/company/yDOcLJggM9S9nUNt1SuQ/service').doc(service)
+			.onSnapshot({includeMetadataChanges:true}, (box)=> {
+				console.log("This is a box",box.id,box.data());
+				addService(box.id, box.data());
+			});
 				
 			//Listener für solche Reservierungen, deren serviceID einem Service an diesem Standort entspricht
 			db.collection("reservation").where("serviceID","==",service)
@@ -147,6 +152,16 @@ function addShare(shareId, shareData){
 	}
 	console.log(payload) //Test
 	updateBoxServer(payload)
+}
+
+function addService(serviceId, service){
+	payload = {
+		id : serviceId,
+		type : "ADD_SERVICE",
+		payload : service
+	}
+	console.log(payload); // Test
+	updateBoxServer(payload);
 }
 
 // Input: param1 ID der zu löschenden Reservierung
