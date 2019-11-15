@@ -20,7 +20,7 @@ class Reservation:
         self.userHasDeleted = reservationJson["userHasDeleted"]
         self.companyHasDeleted = reservationJson["companyHasDeleted"]
         #self.reasonWhyDeleted = reservationJsonreason["WhyDeleted"]
-        self.used = reservationJson["used"] # Nicht nötig
+        #self.used = reservationJson["used"] # Nicht nötig
         self.qrCode = reservationJson["qrCode"]
     
     ## Methoden
@@ -51,7 +51,7 @@ class Reservation:
             "userID" : self.userID,
             "userHasDeleted" : self.userHasDeleted,
             "companyHasDeleted" : self.companyHasDeleted,
-            "used" : self.used,
+            #"used" : self.used,
             "qrCode" : self.qrCode
         }
     
