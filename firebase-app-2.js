@@ -16,8 +16,6 @@ firebase.initializeApp({
 
 const db = firebase.firestore();
 
-let datastructure = {};
-
 // Alle Services, die auf der Location registriert sind als Array holen
 let locationReference = db.collection('/company/yDOcLJggM9S9nUNt1SuQ/location');
 let services = locationReference.doc(location).get();
@@ -77,7 +75,7 @@ services.then(function(doc){
 							}
 						});
 					}
-							//Unnötig
+					//Unnötig
 					else{
 						console.log("change type: ", change.type);
 					}
