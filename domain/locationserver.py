@@ -47,7 +47,7 @@ while True:
         elif jsonData["type"] == "DELETE":
             locationController.deleteReservation(jsonData["id"])
         
-        elif jsonData["type"] == "CHECK":
+        elif jsonData["type"] == "CHECK_RESERVATION":
             locationController.checkReservation(jsonData["key"])
         
         # elif jsonData["type"] == "CHECK":
