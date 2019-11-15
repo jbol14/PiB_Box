@@ -13,9 +13,16 @@ const LOCATION = 'yti5YJIX1Cnw0Pek79en/';
 
 // Firebase-App initialisieren
 firebase.initializeApp({
-    apiKey : apiKey.getKey(),
-    projectId: 'raspi-python-test'
-});
+    apiKey: apiKey.getKey(),
+    authDomain: "boxsystem-a20f5.firebaseapp.com",
+    databaseURL: "https://boxsystem-a20f5.firebaseio.com",
+    projectId: "boxsystem-a20f5",
+    storageBucket: "boxsystem-a20f5.appspot.com",
+    messagingSenderId: "43374441475",
+    appId: "1:43374441475:web:1a57abdbdd3ad823fc8a36",
+    measurementId: "G-YL4Q3QH12C"
+  }
+);
 
 const db = firebase.firestore();
 
