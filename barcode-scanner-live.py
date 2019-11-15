@@ -32,11 +32,21 @@ while True:
 		if os.path.exists(SOCKETFILE):
 			client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 			client.connect(SOCKETFILE)
-	
+
+			keyFields = key.split("=>")
+
+			if len(keyFields) is not 4:
+				break
+
+			if keyFields[2] == "false":
+				operationType = "CHECK_RESERVATION"
+			
+			else:
+				operationType = "CHECK_SHARE"
 			print("Connected to Socket")
 
 			req = {
-			"type" : "CHECK",
+			"type" : operationType,
 			"key" : key
 			}
 						
