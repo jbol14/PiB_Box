@@ -8,3 +8,4 @@ reservation.json
 shares.json
 __pycache__
 domain/*.json
+services.json
