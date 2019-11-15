@@ -9,3 +9,5 @@ shares.json
 __pycache__
 domain/*.json
 services.json
+services.json
+*.json

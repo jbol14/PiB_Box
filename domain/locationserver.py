@@ -41,7 +41,6 @@ while True:
             locationController.updateShare(jsonData)
 
         elif jsonData["type"] == "ADD_SERVICE":
-            print(jsonData["payload"]) #Test
             locationController.updateService(jsonData)
         
         elif jsonData["type"] == "DELETE":
