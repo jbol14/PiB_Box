@@ -50,13 +50,6 @@ while True:
         elif jsonData["type"] == "CHECK_RESERVATION":
             locationController.checkReservation(jsonData["key"])
         
-        # elif jsonData["type"] == "CHECK":
-        #     result = locationController.checkReservation(jsonData["key"])
-        #     if result:
-        #         #locationController.openBox("TestID")
-        #         print("Match!!")
-        #     else:
-        #         print("No fitting Box")
         elif jsonData["type"] == "CHECK_SHARE":
             locationController.checkShare(jsonData["key"])
         
