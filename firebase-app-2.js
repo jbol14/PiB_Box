@@ -52,7 +52,9 @@ services.then(function(doc){
 						//Neuen Listener auf das Dokument setzen
 						db.collection("reservation").doc(change.doc.id)
 						.onSnapshot({includeMetadataChanges:false},(reservation)=>{
-							console.log("data: ",reservation.data()); //Test
+							reducedData = reservation.data();
+							delete reducedData.used
+							console.log("data: ",reducedData); //Test
 							if(reservation.data() && validReservation(reservation.data())){
 										
 								//Listener für Shares setzen
@@ -66,8 +68,8 @@ services.then(function(doc){
 								});
 
 
-								console.log('Gültige Reservierung',reservation.id,reservation.data()); //Test
-								addReservation(reservation.id,reservation.data());
+								console.log('Gültige Reservierung',reservation.id,reducedData); //Test
+								addReservation(reservation.id,reducedData);
 							}
 							else{
 								console.log('Reservierung abgelaufen',reservation.id); //Test
