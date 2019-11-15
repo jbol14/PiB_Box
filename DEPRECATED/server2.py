@@ -1,7 +1,7 @@
 import socket
 import os
 import json
-from reservationcontroller import ReservationController
+from ../Location/reservationcontroller import ReservationController
 
 ## Konstanten
 SOCKETPATH  = "/tmp/unix.sock"

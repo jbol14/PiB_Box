@@ -1,7 +1,7 @@
 const firebase = require('firebase');
 const net = require('net');
 require('firebase/firestore');
-const apiKey = require('./api');
+const apiKey = require('../Firebase/api');
 
 //Konstanten
 const SOCKETFILE = '/tmp/unix.sock';
