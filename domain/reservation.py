@@ -11,7 +11,7 @@ class Reservation:
     def __init__(self, id, reservationJson, service):
         #print(reservationJson["serviceID"]) # Test
         self.id = id
-        self.serviceID = reservationJson["serviceID"] #Nicht sicher ob das gebraucht wird wenn Service als Attribut da ist
+        self.serviceID = reservationJson["serviceID"] # Nicht sicher ob das gebraucht wird wenn Service als Attribut da ist
         self.resFrom = reservationJson["resFrom"]
         self.resTill = reservationJson["resTill"]
         #self.resTime = reservationJson["resTime"] # Nicht nötig
