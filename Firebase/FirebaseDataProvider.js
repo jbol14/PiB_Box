@@ -67,7 +67,7 @@ let query = services.onSnapshot({includeMetadataChanges:true}, (service)=>{
 
                         else{
                             console.log("Reservierung abgelaufen", reservation.id); // Test
-                            deleteReservation
+                            deleteReservation(reservation.id)
                         }
                     });
                 }
@@ -76,16 +76,6 @@ let query = services.onSnapshot({includeMetadataChanges:true}, (service)=>{
         });
     });
 });
-
-// query.then((querySnapshot)=>{
-//     querySnapshot.forEach((doc)=>{console.log(doc.id,doc.data())}) //Test
-//     // Services erstellen
-//     let reducedData = {
-//         id : doc.id,
-//         category : doc.data().category
-//     }
-// })
-
 
 function addService(serviceId, service){
 	payload = {
