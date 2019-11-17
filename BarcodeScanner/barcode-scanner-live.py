@@ -3,7 +3,6 @@ from pyzbar import pyzbar
 import imutils
 from imutils.video import VideoStream
 import time
-from box import Box
 import socket
 import os
 import json
@@ -35,10 +34,10 @@ while True:
 
 			keyFields = key.split("=>")
 
-			if len(keyFields) is not 4:
+			if len(keyFields) is not 5:
 				break
 
-			if keyFields[2] == "false":
+			if keyFields[3] == "false":
 				operationType = "CHECK_RESERVATION"
 			
 			else:
@@ -51,22 +50,8 @@ while True:
 			}
 						
 			client.send(json.dumps(req).encode("UTF-8"))
-						
-
-			data = client.recv(1024).decode("UTF-8")
-
-			print(data)
-
-			
-			dataDict = json.loads(data)
-			## TODO Check if valid Data was returned
-			## Determine the Pin for the Box that was returned
-			if dataDict != {}:
-				GPIO.output(24, GPIO.HIGH)
-				time.sleep(0.2)
-				GPIO.output(24, GPIO.LOW)
-				time.sleep(10)
 			client.close()
+			time.sleep(3.0)
 		#Addition
 		#keyCheckResult = checkKey(keys,barcode.data.decode("utf-8"))
 		#print(keyCheckResult)
