@@ -2,10 +2,12 @@ from service import Service
 import os
 import socket
 import json
+import datetime
 
 class Reservation:
     ## Globale Variablen
     LOGSOCKETPATH = "/tmp/firebase-logger.sock"
+    PENDING_LOG_BUFFER_PATH = "./pending_logs.json"
 
     ## Konstruktor
     def __init__(self, id, reservationJson, service):
@@ -28,13 +30,32 @@ class Reservation:
         if os.path.exists(self.LOGSOCKETPATH):
 
             used = {"whoUsed" : self.userID}
-            payload = json.dumps({"reservationId" : self.id, "used" : used})
+            payload = {"reservationId" : self.id, "used" : used}
 
             client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-            client.connect(self.LOGSOCKETPATH)
-            client.send(payload.encode("UTF-8"))
-            client.close()
+            try:
+                client.connect(self.LOGSOCKETPATH)
+                client.send(json.dumps(payload).encode("UTF-8"))
+                
+            except ConnectionRefusedError:
+                print("FirebaseUsage Logger not available")
+                try:
+                    payload["used"]["whenUsed"] = datetime.datetime.now().timestamp()
+                    file = open(self.PENDING_LOG_BUFFER_PATH, "rt")
+                    fileContent = json.loads(file.read())
+                    file.close()
+                    fileContent.append(payload)
 
+                except FileNotFoundError:
+                    fileContent = []
+                    fileContent.append(payload)
+                    
+                finally:
+                    file = open(self.PENDING_LOG_BUFFER_PATH, "w")
+                    file.write(json.dumps(fileContent))
+                    file.close()
+            finally:
+                client.close()
 
 
     def useReservation(self):
