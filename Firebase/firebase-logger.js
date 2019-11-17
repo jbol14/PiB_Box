@@ -45,6 +45,9 @@ function init(){
     pendingLogs = JSON.parse(content);
     console.log(pendingLogs) // Test
     pendingLogs.forEach(log => writeBackUp(log))
+    // TODO: pendingLogs löschen
+    fs.unlinkSync(PENDING_LOGS_BUFFER_PATH);
+
     let socketServer = net.createServer();
 
     //Falls der Socket bereits existiert: entfernen
