@@ -5,7 +5,6 @@ const apiKey = require('./api');
 
 //Konstanten
 const SOCKETFILE = '/tmp/unix.sock';
-const location = 'yti5YJIX1Cnw0Pek79en/';
 
 //Firebase-App initialisieren
 firebase.initializeApp({
@@ -19,7 +18,7 @@ firebase.initializeApp({
   }
 );
 
-firebase.auth().signInWithEmailAndPassword("jbol14@tu-clausthal.de","supersicher")
+firebase.auth().signInWithEmailAndPassword("jbol14@tu-clausthal.de","1234567")
 .then((_)=>{
     init();
 })
