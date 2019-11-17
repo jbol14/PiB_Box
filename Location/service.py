@@ -15,7 +15,7 @@ class Service:
     def open(self):
         print("Opened Service {} at Pin {}".format(self.id, self.gpioPin))
         #GPIO.output(self.gpioPin, GPIO.HIGH)
-        #sleep(0.2)
+        #time.sleep(0.2)
         #GPIO.output(self.gpioPin, GPIO.LOW)
     
     def getId(self):
