@@ -7,13 +7,6 @@ import socket
 import os
 import json
 
-import RPi.GPIO as GPIO
-
-GPIO.setmode(GPIO.BCM)
-## Define Output Pins for Relays
-## Currently, the only Relay is on Pin 24
-GPIO.setup(24, GPIO.OUT)
-
 SOCKETFILE = "/tmp/unix.sock"
 
 vs = VideoStream(usePiCamera = True).start()
@@ -52,10 +45,3 @@ while True:
 			client.send(json.dumps(req).encode("UTF-8"))
 			client.close()
 			time.sleep(3.0)
-		#Addition
-		#keyCheckResult = checkKey(keys,barcode.data.decode("utf-8"))
-		#print(keyCheckResult)
-		#TODO: Set green LED on and trigger Relais to open box if True
-		# Turn red LED on otherwise
-		#Iterate over all known boxes
-	
