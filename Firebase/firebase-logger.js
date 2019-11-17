@@ -7,9 +7,11 @@ const net = require('net');
 require('firebase/firestore');
 const apiKey = require('./api');
 
+
 // Konstanten
 const SOCKETFILE = '/tmp/firebase-logger.sock';
 const LOCATION = 'yti5YJIX1Cnw0Pek79en/';
+const PENDING_LOGS_BUFFER_PATH = "./pending_logs.json";
 
 // Firebase-App initialisieren
 firebase.initializeApp({
@@ -37,6 +39,12 @@ firebase.auth().signInWithEmailAndPassword("jbol14@tu-clausthal.de","1234567")
 
 //const locationReference = db.collection('/company/yDOcLJggM9S9nUNt1SuQ/location');
 function init(){
+    //pending logs einlesen
+    content = fs.readFileSync(PENDING_LOGS_BUFFER_PATH, "UTF-8")
+    console.log(content) // Test
+    pendingLogs = JSON.parse(content);
+    console.log(pendingLogs) // Test
+    pendingLogs.forEach(log => writeBackUp(log))
     let socketServer = net.createServer();
 
     //Falls der Socket bereits existiert: entfernen
@@ -48,20 +56,7 @@ function init(){
         console.log("Listening");
     });
     socketServer.on("connection", (s)=>{
-        s.on('data',(data)=>{
-            str = data.toString();
-            console.log("data recieved")
-            console.log(str);
-            js = JSON.parse(str);
-            console.log(js);
-            if (!js.reservationId || !js.used){
-                console.log("fehlerhaftes Objekt");
-            }
-            else{
-                js.used.whenUsed = firebase.firestore.Timestamp.now();
-                writeBack(js.reservationId,js.used);
-            }
-        });
+        s.on('data',(data)=>writeLive(data));
         s.on("end", () => {
             console.log("connection terminated")
         });
@@ -79,4 +74,38 @@ function writeBack(reservationId, serviceCounter){
     console.log(serviceCounter);
     const db = firebase.firestore();
     db.collection('reservation').doc(reservationId).update({used : firebase.firestore.FieldValue.arrayUnion(serviceCounter)})
+}
+
+//Funktion zum Schreiben von gepufferten Daten
+function writeBackUp(data){
+    str = data.toString();
+    console.log("data recieved")
+    console.log(data);
+    if (!data.reservationId || !data.used){
+        console.log("fehlerhaftes Objekt");
+    }
+    else {
+        timestamp = Math.floor(data.used.whenUsed*1000);
+        console.log(timestamp*1000);
+        data.used.whenUsed = firebase.firestore.Timestamp.fromMillis(timestamp);
+    }
+    
+    writeBack(data.reservationId,data.used);
+    
+}
+
+//Funktion zum Schreiben von Live-Daten
+function writeLive(data){
+    str = data.toString();
+        console.log("data recieved")
+        console.log(str);
+        js = JSON.parse(str);
+        console.log(js);
+        if (!js.reservationId || !js.used){
+            console.log("fehlerhaftes Objekt");
+        }
+        else{
+            js.used.whenUsed = firebase.firestore.Timestamp.now();
+            writeBack(js.reservationId,js.used);
+        }
 }
