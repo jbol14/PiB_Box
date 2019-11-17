@@ -23,7 +23,7 @@ firebase.initializeApp({
   }
 );
 
-firebase.auth().signInWithEmailAndPassword("jbol14@tu-clausthal.de","supersicher")
+firebase.auth().signInWithEmailAndPassword("jbol14@tu-clausthal.de","1234567")
 .then((_)=>{
     init();
 })
