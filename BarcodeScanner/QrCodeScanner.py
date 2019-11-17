@@ -23,25 +23,30 @@ while True:
 		
 		if os.path.exists(SOCKETFILE):
 			client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-			client.connect(SOCKETFILE)
+			try:
+				client.connect(SOCKETFILE)
 
-			keyFields = key.split("=>")
+				keyFields = key.split("=>")
 
-			if len(keyFields) is not 5:
-				break
+				if len(keyFields) is not 5:
+					break
 
-			if keyFields[3] == "false":
-				operationType = "CHECK_RESERVATION"
+				if keyFields[3] == "false":
+					operationType = "CHECK_RESERVATION"
 			
-			else:
-				operationType = "CHECK_SHARE"
-			print("Connected to Socket")
+				else:
+					operationType = "CHECK_SHARE"
+				
+				print("Connected to Socket")
 
-			req = {
-			"type" : operationType,
-			"key" : key
-			}
+				req = {
+				"type" : operationType,
+				"key" : key
+				}
 						
-			client.send(json.dumps(req).encode("UTF-8"))
-			client.close()
-			time.sleep(3.0)
+				client.send(json.dumps(req).encode("UTF-8"))
+			except ConnectionRefusedError:
+				print("Tried to scan QR-Code, but LoactionServer was not available")
+			finally:
+				client.close()
+				time.sleep(3.0)
