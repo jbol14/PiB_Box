@@ -121,7 +121,7 @@ function updateBoxServer(document){
 		console.error(error,document);
 	});
 }
-
+// TODO: Wenn LocationSever nicht verfügbar, änderungen direkt in entsprechende json Datei schreiben
 function addReservation(reservationId, reservation){
 	reservation.resFrom = reservation.resFrom.toMillis(); //Neu, in Millisekunden umwandeln
 	reservation.resTill = reservation.resTill.toMillis(); //Neu, in Millisekunden umwandeln
