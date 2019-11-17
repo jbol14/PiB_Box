@@ -19,64 +19,64 @@ firebase.initializeApp({
     projectId: "boxsystem-a20f5",
     storageBucket: "boxsystem-a20f5.appspot.com",
     messagingSenderId: "43374441475",
-    appId: "1:43374441475:web:1a57abdbdd3ad823fc8a36",
-    measurementId: "G-YL4Q3QH12C"
+    appId: "1:43374441475:web:28ffa1c300028d56fc8a36"
   }
 );
 
-const db = firebase.firestore();
-
-const locationReference = db.collection('/company/yDOcLJggM9S9nUNt1SuQ/location');
-
-let socketServer = net.createServer();
-
-//Falls der Socket bereits existiert: entfernen
-if(fs.existsSync(SOCKETFILE)){
-    fs.unlinkSync(SOCKETFILE)
-} 
-
-socketServer.listen(SOCKETFILE, ()=>{
-    console.log("Listening");
-});
-socketServer.on("connection", (s)=>{
-    s.on('data',(data)=>{
-        str = data.toString();
-        console.log("data recieved")
-        console.log(str);
-        js = JSON.parse(str);
-        console.log(js);
-        if (!js.reservationId || !js.used){
-            console.log("fehlerhaftes Objekt");
-        }
-        else{
-            // numericalTimestamp = Date.now();
-            // arrayLength = js.used.length;
-            // js.used[arrayLength-1].whenUsed = firebase.firestore.Timestamp.now();
-
-            // console.log(numericalTimestamp);
-            // console.log(typeof js.used.whenUsed)
-
-            // console.log(typeof js.used.whenUsed)
-            js.used.whenUsed = firebase.firestore.Timestamp.now();
-            writeBack(js.reservationId,js.used)
+firebase.auth().signInWithEmailAndPassword("jbol14@tu-clausthal.de","supersicher")
+.then((_)=>{
+    init();
+})
+.catch((error)=>{
+    console.error(error);
+})
 
 
-        }
+
+//firebase.firestore().enablePersistence();
+
+//const locationReference = db.collection('/company/yDOcLJggM9S9nUNt1SuQ/location');
+function init(){
+    let socketServer = net.createServer();
+
+    //Falls der Socket bereits existiert: entfernen
+    if(fs.existsSync(SOCKETFILE)){
+        fs.unlinkSync(SOCKETFILE)
+    } 
+
+    socketServer.listen(SOCKETFILE, ()=>{
+        console.log("Listening");
     });
-    s.on("end", () => {
-        console.log("connection terminated")
+    socketServer.on("connection", (s)=>{
+        s.on('data',(data)=>{
+            str = data.toString();
+            console.log("data recieved")
+            console.log(str);
+            js = JSON.parse(str);
+            console.log(js);
+            if (!js.reservationId || !js.used){
+                console.log("fehlerhaftes Objekt");
+            }
+            else{
+                js.used.whenUsed = firebase.firestore.Timestamp.now();
+                writeBack(js.reservationId,js.used);
+            }
+        });
+        s.on("end", () => {
+            console.log("connection terminated")
+        });
+        s.on("error", (error)=>{
+            console.error(error);
+        });
+        console.log("Connection");
     });
-    s.on("error", (error)=>{
-        console.error(error);
+    socketServer.on("data", (data)=>{
+        console.log(data.toString());
     });
-    console.log("Connection");
-});
-socketServer.on("data", (data)=>{
-    console.log(data.toString());
-});
-
+}
 // Funktion zum zuückschreiben des erhöhten Zählers
 function writeBack(reservationId, serviceCounter){
     console.log(serviceCounter);
+    const db = firebase.firestore();
     db.collection('reservation').doc(reservationId).update({used : firebase.firestore.FieldValue.arrayUnion(serviceCounter)})
 }

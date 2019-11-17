@@ -15,77 +15,74 @@ firebase.initializeApp({
     projectId: "boxsystem-a20f5",
     storageBucket: "boxsystem-a20f5.appspot.com",
     messagingSenderId: "43374441475",
-    appId: "1:43374441475:web:1a57abdbdd3ad823fc8a36",
-    measurementId: "G-YL4Q3QH12C"
+    appId: "1:43374441475:web:28ffa1c300028d56fc8a36"
   }
 );
 
-const db = firebase.firestore();
+firebase.auth().signInWithEmailAndPassword("jbol14@tu-clausthal.de","supersicher")
+.then((_)=>{
+    init();
+})
+.catch((error)=>{
+    console.error(error);
+})
+function init(){
+    const db = firebase.firestore();
 
-const serviceRef = db.collection('/company/FEOq6WEjsTOf1nV7SQMl7xla63P2/service');
+    const serviceRef = db.collection('/company/FEOq6WEjsTOf1nV7SQMl7xla63P2/service');
 
 //const services = companyReference.doc(services).where("address","==", "Leibnizstraße,10,Clausthal-Zellerfeld,38678").get()
-const services = serviceRef.where("address", "==", "Leibnizstraße,10,Clausthal-Zellerfeld,38678");
+    const services = serviceRef.where("address", "==", "Leibnizstraße,10,Clausthal-Zellerfeld,38678");
 
-let query = services.onSnapshot({includeMetadataChanges:true}, (service)=>{
-    service.forEach((box)=>{
-        console.log(box.id); // Test
-        let reducedData = {
-            id : box.id,
-            category : box.data().category
-        }
-        console.log(reducedData) // Test
-        addService(box.id, reducedData)
+    let query = services.onSnapshot({includeMetadataChanges:true}, (service)=>{
+        service.forEach((box)=>{
+            console.log(box.id); // Test
+            let reducedData = {
+                id : box.id,
+                category : box.data().category
+            }
+            console.log(reducedData) // Test
+            addService(box.id, reducedData)
 
-        // Reservierungen für diese Box
-        db.collection("reservation").where("serviceID", "==", box.id)
-        .onSnapshot({includeMetadataChanges:true},(reservationCollection)=>{
-            reservationCollection.docChanges().forEach((change)=>{
-                if(change.type === 'added'){
-                    console.log("Neue Reservierung"); // Test
-                    //Listener auf Neue Reservierung setzen
-                    db.collection("reservation").doc(change.doc.id)
-                    .onSnapshot({includeMetadataChanges:true}, (reservation)=>{
-                        reducedReservation = reservation.data();
-                        delete reducedReservation.used;
-                        console.log("data: ", reducedReservation); //Test
-                        if(reservation.data() && validReservation(reducedReservation)){
-                            //Listener für Shares
-                            db.collection("sharing").where("reservationID", "==", reservation.id)
-                            .onSnapshot({includeMetadataChanges:true}, (shares)=>{
-                                shares.docChanges().forEach((change)=>{
-                                    if(change.type == 'added'){
-                                        addShare(change.doc.id, change.doc.data());
-                                    }
+            // Reservierungen für diese Box
+            db.collection("reservation").where("serviceID", "==", box.id)
+            .onSnapshot({includeMetadataChanges:true},(reservationCollection)=>{
+                reservationCollection.docChanges().forEach((change)=>{
+                    if(change.type === 'added'){
+                        console.log("Neue Reservierung"); // Test
+                        //Listener auf Neue Reservierung setzen
+                        db.collection("reservation").doc(change.doc.id)
+                        .onSnapshot({includeMetadataChanges:true}, (reservation)=>{
+                            reducedReservation = reservation.data();
+                            delete reducedReservation.used;
+                            console.log("data: ", reducedReservation); //Test
+                            if(reservation.data() && validReservation(reducedReservation)){
+                                //Listener für Shares
+                                db.collection("sharing").where("reservationID", "==", reservation.id)
+                                .onSnapshot({includeMetadataChanges:true}, (shares)=>{
+                                    shares.docChanges().forEach((change)=>{
+                                        if(change.type == 'added'){
+                                            addShare(change.doc.id, change.doc.data());
+                                        }
+                                    });
                                 });
-                            });
 
-                            console.log("gültige Reservierung", reservation.id, reducedReservation);
-                            addReservation(reservation.id, reducedReservation)
+                                console.log("gültige Reservierung", reservation.id, reducedReservation);
+                                addReservation(reservation.id, reducedReservation)
 
-                        }
+                            }
 
-                        else{
-                            console.log("Reservierung abgelaufen", reservation.id); // Test
-                            deleteReservation
-                        }
-                    });
-                }
-            })
-            
+                            else{
+                                console.log("Reservierung abgelaufen", reservation.id); // Test
+                                deleteReservation(reservation.id);
+                            }
+                        });
+                    }
+                });
+            });
         });
     });
-});
-
-// query.then((querySnapshot)=>{
-//     querySnapshot.forEach((doc)=>{console.log(doc.id,doc.data())}) //Test
-//     // Services erstellen
-//     let reducedData = {
-//         id : doc.id,
-//         category : doc.data().category
-//     }
-// })
-
+}
 
 function addService(serviceId, service){
 	payload = {
