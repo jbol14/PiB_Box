@@ -1,0 +1,11 @@
+[Unit]
+Description=Manages Updates from Firebase as Part of the Box Application
+After=network.target boxserver.service
+
+[Service]
+ExecStart=/usr/bin/node /home/pi/PiB_Box/firebase-app-2.js
+Restart=always
+WorkingDirectory=/home/pi/PiB_Box
+
+[Install]
+WantedBy=multi-user.target

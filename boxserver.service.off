@@ -1,0 +1,12 @@
+[Unit]
+Description=Socket Server for the Box Application
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/PiB_Box/server.py
+Restart=always
+WorkingDirectory=/home/pi/PiB_Box
+
+[Install]
+WantedBy=multi-user.target
+
