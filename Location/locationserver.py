@@ -7,6 +7,40 @@ from locationcontroller import LocationController
 SOCKETPATH = "/tmp/unix.sock"
 locationController = LocationController()
 
+def updateLocation(jsonData):
+    if jsonData["type"] == "ADD_RESERVATION":
+        locationController.updateReservation(jsonData)
+        
+    elif jsonData["type"] == "ADD_SHARE":
+        locationController.updateShare(jsonData)
+
+    elif jsonData["type"] == "ADD_SERVICE":
+        locationController.updateService(jsonData)
+        
+    elif jsonData["type"] == "DELETE":
+        locationController.deleteReservation(jsonData["id"])
+        
+    elif jsonData["type"] == "CHECK_RESERVATION":
+        locationController.checkReservation(jsonData["key"])
+        
+    elif jsonData["type"] == "CHECK_SHARE":
+        locationController.checkShare(jsonData["key"])
+
+
+def readPendingUpdates():
+    file = open("pendingUpdates.json","rt")
+    fileAsDict = json.loads(file.read())
+    file.close()
+    ## Updates ausführen
+    for f in fileAsDict:
+        print(f)
+        updateLocation(f)
+    ## pendingUpdates.json zurücksetzen
+    file = open("pendingUpdates.json", "w")
+    file.write(json.dumps([]))
+
+readPendingUpdates()
+
 if os.path.exists(SOCKETPATH):
     os.remove(SOCKETPATH)
 
@@ -34,23 +68,25 @@ while True:
 
         jsonData = json.loads(dataString)
 
-        if jsonData["type"] == "ADD_RESERVATION":
-            locationController.updateReservation(jsonData)
-        
-        elif jsonData["type"] == "ADD_SHARE":
-            locationController.updateShare(jsonData)
+        updateLocation(jsonData)
 
-        elif jsonData["type"] == "ADD_SERVICE":
-            locationController.updateService(jsonData)
+        # if jsonData["type"] == "ADD_RESERVATION":
+        #     locationController.updateReservation(jsonData)
         
-        elif jsonData["type"] == "DELETE":
-            locationController.deleteReservation(jsonData["id"])
+        # elif jsonData["type"] == "ADD_SHARE":
+        #     locationController.updateShare(jsonData)
+
+        # elif jsonData["type"] == "ADD_SERVICE":
+        #     locationController.updateService(jsonData)
         
-        elif jsonData["type"] == "CHECK_RESERVATION":
-            locationController.checkReservation(jsonData["key"])
+        # elif jsonData["type"] == "DELETE":
+        #     locationController.deleteReservation(jsonData["id"])
         
-        elif jsonData["type"] == "CHECK_SHARE":
-            locationController.checkShare(jsonData["key"])
+        # elif jsonData["type"] == "CHECK_RESERVATION":
+        #     locationController.checkReservation(jsonData["key"])
+        
+        # elif jsonData["type"] == "CHECK_SHARE":
+        #     locationController.checkShare(jsonData["key"])
         
     
     conn.close()
