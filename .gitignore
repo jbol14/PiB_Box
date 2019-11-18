@@ -1,7 +1,6 @@
 api.js
 node_modules
 package-lock.json
-server_test.py
 data.json
 .vscode
 reservation.json
