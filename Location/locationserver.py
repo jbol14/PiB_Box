@@ -28,16 +28,20 @@ def updateLocation(jsonData):
 
 
 def readPendingUpdates():
-    file = open("pendingUpdates.json","rt")
-    fileAsDict = json.loads(file.read())
-    file.close()
-    ## Updates ausführen
-    for f in fileAsDict:
-        print(f)
-        updateLocation(f)
-    ## pendingUpdates.json zurücksetzen
-    file = open("pendingUpdates.json", "w")
-    file.write(json.dumps([]))
+    try:
+        file = open("pendingUpdates.json","rt")
+        fileAsDict = json.loads(file.read())
+        file.close()
+        ## Updates ausführen
+        for f in fileAsDict:
+            print(f)
+            updateLocation(f)
+        ## pendingUpdates.json zurücksetzen
+    except FileNotFoundError:
+        print("No such File, creating")
+    finally:
+        file = open("pendingUpdates.json", "w")
+        file.write(json.dumps([]))
 
 readPendingUpdates()
 
