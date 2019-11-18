@@ -157,7 +157,13 @@ function deleteReservation(reservationId){
 }
 
 function writeToBackupFile(error,document){
-    content = fs.readFileSync('./pendingUpdates.json')
+    try{
+        content = fs.readFileSync('./pendingUpdates.json')
+    }
+    catch(error){
+        content = "[]";
+        fs.writeFileSync("pendingUpdates.json",content);
+    }
     console.log(content);
     js = JSON.parse(content);
     console.log(typeof js);
