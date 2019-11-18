@@ -2,6 +2,7 @@ const firebase = require('firebase');
 const net = require('net');
 require('firebase/firestore');
 const apiKey = require('./api');
+const fs = require('fs');
 
 //Konstanten
 const SOCKETFILE = '/tmp/unix.sock';
@@ -118,10 +119,13 @@ function updateBoxServer(document){
 		console.log('Disconnected from Socket');
 	});
 	client.on('error',(error)=>{
-		console.error(error,document);
+        writeToBackupFile(error,document);
+        //console.error(error,document);
+        
+
 	});
 }
-// TODO: Wenn LocationSever nicht verfügbar, änderungen direkt in entsprechende json Datei schreiben
+
 function addReservation(reservationId, reservation){
 	reservation.resFrom = reservation.resFrom.toMillis(); //Neu, in Millisekunden umwandeln
 	reservation.resTill = reservation.resTill.toMillis(); //Neu, in Millisekunden umwandeln
@@ -150,4 +154,15 @@ function deleteReservation(reservationId){
 	};
 	console.log(payload); //Test
 	updateBoxServer(payload);
+}
+
+function writeToBackupFile(error,document){
+    content = fs.readFileSync('./pendingUpdates.json')
+    console.log(content);
+    js = JSON.parse(content);
+    console.log(typeof js);
+    console.log("After Reading File", js);
+    js.push(document);
+    console.log("After appending",js)
+    fs.writeFileSync('pendingUpdates.json', JSON.stringify(js));
 }
