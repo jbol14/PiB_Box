@@ -38,7 +38,6 @@ def readPendingUpdates():
             updateLocation(f)
         ## pendingUpdates.json zurücksetzen
     except FileNotFoundError:
-        
         print("No such File, creating")
     finally:
         file = open("pendingUpdates.json", "w")
