@@ -1,0 +1,11 @@
+[Unit]
+Description=Decodes Images from the Camera and searches for QR Codes as part of the Box Application
+After=network.target boxserver.service
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/PiB_Box/barcode-scanner-live.py
+Restart=always
+WorkingDirectory=/home/pi/PiB_Box
+
+[Install]
+WantedBy=multi-user.target
