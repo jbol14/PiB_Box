@@ -39,14 +39,17 @@ firebase.auth().signInWithEmailAndPassword("jbol14@tu-clausthal.de","1234567")
 
 //const locationReference = db.collection('/company/yDOcLJggM9S9nUNt1SuQ/location');
 function init(){
-    //pending logs einlesen
-    content = fs.readFileSync(PENDING_LOGS_BUFFER_PATH, "UTF-8")
-    console.log(content) // Test
-    pendingLogs = JSON.parse(content);
-    console.log(pendingLogs) // Test
-    pendingLogs.forEach(log => writeBackUp(log))
-    // TODO: pendingLogs löschen
-    fs.unlinkSync(PENDING_LOGS_BUFFER_PATH);
+    //pending logs einlesen, sofern es welche gibt
+    if(fs.existsSync(PENDING_LOGS_BUFFER_PATH)){
+        content = fs.readFileSync(PENDING_LOGS_BUFFER_PATH, "UTF-8")
+        console.log(content) // Test
+        pendingLogs = JSON.parse(content);
+        console.log(pendingLogs) // Test
+        pendingLogs.forEach(log => writeBackUp(log))
+        // TODO: pendingLogs löschen
+        fs.unlinkSync(PENDING_LOGS_BUFFER_PATH);
+    }
+    
 
     let socketServer = net.createServer();
 
