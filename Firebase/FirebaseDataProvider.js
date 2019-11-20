@@ -35,77 +35,81 @@ function init(){
     const services = serviceRef.where("address", "==", "Leibnizstraße,10,Clausthal-Zellerfeld,38678");
 
     let query = services.onSnapshot({includeMetadataChanges:true}, (service)=>{
-        service.forEach((box)=>{
-            console.log(box.id); // Test
-            let reducedData = {
-                id : box.id,
-                category : box.data().category
-            }
-            console.log(reducedData) // Test
-            addService(box.id, reducedData)
+        service.docChanges().forEach((box)=>{
+            // console.log(box.id); // Test
+            // let reducedData = {
+            //     id : box.id,
+            //     category : box.data().category
+            // }
+            // console.log(reducedData) // Test
+            // addService(box.id, reducedData)
+            if(box.type == "added"){
+                let reducedData = {
+                    id : box.doc.id,
+                    category : box.doc.category
+                }
+                addService(box.doc.id,box.doc.data());
 
-            // Reservierungen für diese Box
-            db.collection("reservation").where("serviceID", "==", box.id)
-            .onSnapshot({includeMetadataChanges:true},(reservationCollection)=>{
-                reservationCollection.docChanges().forEach((change)=>{
-                    // Reservierung wurde in der Datenbank hinzugefügt
-                    if(change.type === 'added'){
-                        console.log("Neue Reservierung"); // Test
-                        //Listener auf Neue Reservierung setzen
-                        db.collection("reservation").doc(change.doc.id)
-                        .onSnapshot({includeMetadataChanges:true}, (reservation)=>{
-                            if(reservation.data()){
-                                reducedReservation = reservation.data();
-                                delete reducedReservation.used;
-                                console.log("data: ", reducedReservation); //Test
+                // ---- Reservierungen
+                db.collection("reservation").where("serviceID", "==", box.doc.id)
+                .onSnapshot({includeMetadataChanges:true},(reservationCollection)=>{
+                    reservationCollection.docChanges().forEach((change)=>{
+                        // Reservierung wurde in der Datenbank hinzugefügt
+                        if(change.type === 'added'){
+                            console.log("Neue Reservierung"); // Test
+                            //Listener auf Neue Reservierung setzen
+                            db.collection("reservation").doc(change.doc.id)
+                            .onSnapshot({includeMetadataChanges:true}, (reservation)=>{
+                                if(reservation.data()){
+                                    reducedReservation = reservation.data();
+                                    delete reducedReservation.used;
+                                    console.log("data: ", reducedReservation); //Test
 
-                                if(validReservation(reducedReservation)){
-                                    //Listener für Shares
-                                    db.collection("sharing").where("reservationID", "==", reservation.id)
-                                    .onSnapshot({includeMetadataChanges:true}, (shares)=>{
-                                        shares.docChanges().forEach((change)=>{
-                                            // Share wurde in der Datenbank hinzugefügt
-                                            if(change.type == 'added'){
-                                                addShare(change.doc.id, change.doc.data());
-                                            }
-                                            else if(change.type == 'removed'){
-                                                deleteShare(change.doc.id);
-                                                console.log("Share", change.doc.id, "wird gelöscht");
-                                            }
+                                    if(validReservation(reducedReservation)){
+                                        // ----- Shares -----
+                                        //Listener für Shares
+                                        db.collection("sharing").where("reservationID", "==", reservation.id)
+                                        .onSnapshot({includeMetadataChanges:true}, (shares)=>{
+                                            shares.docChanges().forEach((change)=>{
+                                                // Share wurde in der Datenbank hinzugefügt
+                                                if(change.type == 'added'){
+                                                    addShare(change.doc.id, change.doc.data());
+                                                }
+                                                else if(change.type == 'removed'){
+                                                    deleteShare(change.doc.id);
+                                                    console.log("Share", change.doc.id, "wird gelöscht");
+                                                }
+                                            });
                                         });
-                                    });
     
-                                    console.log("gültige Reservierung", reservation.id, reducedReservation);
-                                    addReservation(reservation.id, reducedReservation)
+                                        console.log("gültige Reservierung", reservation.id, reducedReservation);
+                                        addReservation(reservation.id, reducedReservation)
     
-                                }
+                                    }
     
-                                else{
-                                    console.log("Reservierung abgelaufen", reservation.id); // Test
-                                    deleteReservation(reservation.id);
-                                }
+                                    else{
+                                        console.log("Reservierung abgelaufen", reservation.id); // Test
+                                        deleteReservation(reservation.id);
+                                    }
 
-                            }
-                        });
-                    }
-                    else if(change.type == 'removed'){
-                        console.log("Reservierung ", change.doc.id, " wird geköscht");
-                        deleteReservation(change.doc.id);
-                    }
+                                }
+                            });
+                        }
+                        else if(change.type == 'removed'){
+                            console.log("Reservierung ", change.doc.id, " wird geköscht");
+                            deleteReservation(change.doc.id);
+                        }
+                    });
                 });
-            });
+                
+            }
+            else if(box.type == "removed"){
+                console.log("Service ", box.doc.id, " wird gelöscht");
+                deleteService(box.doc.id);
+            }
         });
+        
     });
-}
-
-function addService(serviceId, service){
-	payload = {
-		id : serviceId,
-		type : "ADD_SERVICE",
-		payload : service
-	}
-	console.log(payload); // Test
-    updateBoxServer(payload);
 }
 
 function validReservation(reservation){
@@ -139,6 +143,7 @@ function updateBoxServer(document){
 
 	});
 }
+//----- Elemente hinzufügen -----
 
 function addReservation(reservationId, reservation){
 	reservation.resFrom = reservation.resFrom.toMillis(); //Neu, in Millisekunden umwandeln
@@ -161,6 +166,18 @@ function addShare(shareId, shareData){
 	updateBoxServer(payload)
 }
 
+function addService(serviceId, service){
+	payload = {
+		id : serviceId,
+		type : "ADD_SERVICE",
+		payload : service
+	}
+	console.log(payload); // Test
+    updateBoxServer(payload);
+}
+
+//----- Elemente entfernen -----------
+
 function deleteReservation(reservationId){
 	payload = {
 		id:reservationId,
@@ -176,6 +193,15 @@ function deleteShare(shareId){
         type : "DELETE_SHARE"
     }
     console.log("Deleting Share");
+    updateBoxServer(payload);
+}
+
+function deleteService(serviceId){
+    payload = {
+        id : serviceId,
+        type : "DELETE_SERVICE"
+    }
+    console.log("Deleting Service");
     updateBoxServer(payload);
 }
 
