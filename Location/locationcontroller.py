@@ -94,6 +94,26 @@ class LocationController:
             self.writeJsonFile(self.SHAREPATH, json.dumps(self.createJsonFromDict(self.shares)))
         except KeyError:
             print("Keine Freigabe mit dieser ID")
+    
+    def deleteService(self, serviceID):
+        try:
+            reservations = []
+            for reservation in self.reservations:
+                if self.reservations[reservation].service.id == serviceID:
+                    reservations.append(reservation["id"])
+            
+            for reservationID in reservations:
+                self.deleteReservation(reservationID)
+
+            
+            del self.services[serviceID]
+
+            self.writeJsonFile(self.SERVICEPATH, json.dumps(self.createJsonFromDict(self.services)))
+
+
+        
+        except KeyError:
+            print("Key Error!")
 
     ## Checking
     def checkReservation(self, key):
