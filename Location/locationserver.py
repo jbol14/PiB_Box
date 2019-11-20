@@ -22,6 +22,9 @@ def updateLocation(jsonData):
     
     elif jsonData["type"] == "DELETE_SHARE":
         locationController.deleteShare(jsonData["id"])
+    
+    elif jsonData["type"] == "DELETE_SERVICE":
+        locationController.deleteService(jsonData["id"])
         
     elif jsonData["type"] == "CHECK_RESERVATION":
         locationController.checkReservation(jsonData["key"])
