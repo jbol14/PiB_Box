@@ -7,7 +7,7 @@ import datetime
 class Reservation:
     ## Globale Variablen
     LOGSOCKETPATH = "/tmp/firebase-logger.sock"
-    PENDING_LOG_BUFFER_PATH = "./pending_logs.json"
+    PENDING_LOG_BUFFER_PATH = "./Configuration/pending_logs.json"
 
     ## Konstruktor
     def __init__(self, id, reservationJson, service):

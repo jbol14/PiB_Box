@@ -7,9 +7,9 @@ from share import Share
 
 class LocationController:
     ## Globale Variablen
-    RESERVATIONPATH = "./reservation.json"
-    SHAREPATH = "./shares.json"
-    SERVICEPATH = "./services.json"
+    RESERVATIONPATH = "./Configuration/reservation.json"
+    SHAREPATH = "./Configuration/shares.json"
+    SERVICEPATH = "./Configuration/services.json"
     services = {}
     reservations = {}
     shares = {}

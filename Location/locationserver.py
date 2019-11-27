@@ -5,6 +5,7 @@ from locationcontroller import LocationController
 
 ## Konstanten
 SOCKETPATH = "/tmp/unix.sock"
+PENDING_UPDATES_PATH = "./Configuration/pendingUpdates.json"
 locationController = LocationController()
 
 def updateLocation(jsonData):
@@ -38,7 +39,7 @@ def updateLocation(jsonData):
 
 def readPendingUpdates():
     try:
-        file = open("pendingUpdates.json","rt")
+        file = open(PENDING_UPDATES_PATH,"rt")
         fileAsDict = json.loads(file.read())
         file.close()
         ## Updates ausführen
@@ -49,7 +50,7 @@ def readPendingUpdates():
     except FileNotFoundError:
         print("No such File, creating")
     finally:
-        file = open("pendingUpdates.json", "w")
+        file = open(PENDING_UPDATES_PATH, "w")
         file.write(json.dumps([]))
 
 readPendingUpdates()

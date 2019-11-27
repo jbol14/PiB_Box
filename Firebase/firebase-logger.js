@@ -11,7 +11,7 @@ const apiKey = require('./api');
 // Konstanten
 const SOCKETFILE = '/tmp/firebase-logger.sock';
 const LOCATION = 'yti5YJIX1Cnw0Pek79en/';
-const PENDING_LOGS_BUFFER_PATH = "./pending_logs.json";
+const PENDING_LOGS_BUFFER_PATH = "./Configuration/pending_logs.json";
 
 // Firebase-App initialisieren
 firebase.initializeApp({

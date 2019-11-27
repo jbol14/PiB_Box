@@ -6,6 +6,7 @@ const fs = require('fs');
 
 //Konstanten
 const SOCKETFILE = '/tmp/unix.sock';
+const PENDING_UPDATES_PATH = "./Configuration/pendingUpdates.json"
 
 //Firebase-App initialisieren
 firebase.initializeApp({
@@ -207,11 +208,11 @@ function deleteService(serviceId){
 
 function writeToBackupFile(error,document){
     try{
-        content = fs.readFileSync('./pendingUpdates.json')
+        content = fs.readFileSync(PENDING_UPDATES_PATH)
     }
     catch(error){
         content = "[]";
-        fs.writeFileSync("pendingUpdates.json",content);
+        fs.writeFileSync(PENDING_UPDATES_PATH, content);
     }
     console.log(content);
     js = JSON.parse(content);
@@ -219,5 +220,5 @@ function writeToBackupFile(error,document){
     console.log("After Reading File", js);
     js.push(document);
     console.log("After appending",js)
-    fs.writeFileSync('pendingUpdates.json', JSON.stringify(js));
+    fs.writeFileSync(PENDING_UPDATES_PATH, JSON.stringify(js));
 }
