@@ -35,8 +35,8 @@ testKeyShare = "=>GSDnzEFodIpumQYVzKAP=>6BVUaRPRC1hYGRaMuhcp0XH24vj2=>soOTjIp2vS
 
 
 
+sendKeyToServer(testKeyReservation,"CHECK_QR_CODE")
 
-sendKeyToServer(testKeyShare, "CHECK_QR_CODE")
 
 time.sleep(5)
 
@@ -45,4 +45,4 @@ time.sleep(5)
 # else:
 #     operation = "CHECK_SHARE"
 
-sendKeyToServer(testKeyReservation,"CHECK_QR_CODE")
+sendKeyToServer(testKeyShare, "CHECK_QR_CODE")
