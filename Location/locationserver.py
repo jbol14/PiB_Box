@@ -25,12 +25,15 @@ def updateLocation(jsonData):
     
     elif jsonData["type"] == "DELETE_SERVICE":
         locationController.deleteService(jsonData["id"])
+
+    elif jsonData["type"] == "CHECK_QR_CODE":
+        locationController.checkQrCode(jsonData["key"])
         
-    elif jsonData["type"] == "CHECK_RESERVATION":
-        locationController.checkReservation(jsonData["key"])
+    # elif jsonData["type"] == "CHECK_RESERVATION":
+    #     locationController.checkReservation(jsonData["key"])
         
-    elif jsonData["type"] == "CHECK_SHARE":
-        locationController.checkShare(jsonData["key"])
+    # elif jsonData["type"] == "CHECK_SHARE":
+    #     locationController.checkShare(jsonData["key"])
 
 
 def readPendingUpdates():

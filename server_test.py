@@ -27,22 +27,22 @@ def sendKeyToServer(key, opType):
 testKeyReservation = "=>GSDnzEFodIpumQYVzKAP=>6BVUaRPRC1hYGRaMuhcp0XH24vj2=>false=>GLuM90ILYHonVJ2ZdVfk"
 testKeyShare = "=>GSDnzEFodIpumQYVzKAP=>6BVUaRPRC1hYGRaMuhcp0XH24vj2=>soOTjIp2vSSt6mRf42zGYYNiTiV2=>GLuM90ILYHonVJ2ZdVfk"
 
-print(testKeyShare.split("=>"))
-if testKeyShare.split("=>")[3] == "false":
-    operation = "CHECK_RESERVATION"
-else:
-    operation = "CHECK_SHARE"
+# print(testKeyShare.split("=>"))
+# if testKeyShare.split("=>")[3] == "false":
+#     operation = "CHECK_RESERVATION"
+# else:
+#     operation = "CHECK_SHARE"
 
 
 
 
-sendKeyToServer(testKeyShare, operation)
+sendKeyToServer(testKeyShare, "CHECK_QR_CODE")
 
 time.sleep(5)
 
-if testKeyReservation.split("=>")[3] == "false":
-    operation = "CHECK_RESERVATION"
-else:
-    operation = "CHECK_SHARE"
+# if testKeyReservation.split("=>")[3] == "false":
+#     operation = "CHECK_RESERVATION"
+# else:
+#     operation = "CHECK_SHARE"
 
-sendKeyToServer(testKeyReservation,operation)
+sendKeyToServer(testKeyReservation,"CHECK_QR_CODE")

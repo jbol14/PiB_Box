@@ -26,21 +26,21 @@ while True:
 			try:
 				client.connect(SOCKETFILE)
 
-				keyFields = key.split("=>")
+				# keyFields = key.split("=>")
 
-				if len(keyFields) is not 5:
-					break
+				# if len(keyFields) is not 5:
+				# 	break
 
-				if keyFields[3] == "false":
-					operationType = "CHECK_RESERVATION"
+				# if keyFields[3] == "false":
+				# 	operationType = "CHECK_RESERVATION"
 			
-				else:
-					operationType = "CHECK_SHARE"
+				# else:
+				# 	operationType = "CHECK_SHARE"
 				
 				print("Connected to Socket")
 
 				req = {
-				"type" : operationType,
+				"type" : "CHECK_QR_CODE",
 				"key" : key
 				}
 						

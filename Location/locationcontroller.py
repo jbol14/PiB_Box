@@ -116,6 +116,13 @@ class LocationController:
             print("Key Error!")
 
     ## Checking
+    def checkQrCode(self, key):
+        ## Prüfen, ob Reservierung oder Freigabe getestet werden soll
+        if key.split("=>")[3] == "false":
+            self.checkReservation(key)
+        else:
+            self.checkShare(key)
+    ## Interne Helfer
     def checkReservation(self, key):
         foundReservation = False
         for reservation in self.reservations:
