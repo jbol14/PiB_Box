@@ -5,7 +5,7 @@ class Box:
         self.pin = pin
 
     def __str__(self):
-        return "This is Box No {}, using Pin {}".format(self.boxNumber, self.pin)
+        return "This is Box No {}, using Pin {}".format(self.boxNumber, self.pin.pinNumber)
 
     def toDict(self):
         return{
