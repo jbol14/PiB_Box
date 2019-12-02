@@ -28,13 +28,16 @@ class LocationController:
         
             boxesDict = open(self.AVAILABLEBOXESPATH,"rt").read()
         
-            self.availableBoxes = json.loads(boxesDict)
+            self.availableBoxes = json.loads(boxesDict)["available"]
+            self.usedBoxes = json.loads(boxesDict)["used"]
         
             print(self.availableBoxes)
         
         except FileNotFoundError:
         
             print("Bitte Setup ausführen")
+            ## Beenden
+            exit()
 
 
         # Services initialisieren
@@ -121,7 +124,30 @@ class LocationController:
 
         self.writeJsonFile(self.SERVICEPATH, json.dumps(self.createJsonFromDict(self.services)))
 
+        #self.writeJsonFile(self.AVAILABLEBOXESPATH, json.dumps({"available" : self.availableBoxes, "used" : self.usedBoxes}))
+
         self.usedBoxes.append(concreteBox)
+
+        tempBx = []
+
+        dc = {}
+
+        for box in self.availableBoxes:
+            tempBx.append(box)
+        
+        dc["available"] = tempBx
+
+        tempBx = []
+
+        for box in self.usedBoxes:
+            tempBx.append(box.toDict())
+        
+        dc["used"] = tempBx
+
+        self.writeJsonFile(self.AVAILABLEBOXESPATH, json.dumps(dc))
+
+
+
 
 
 
@@ -176,11 +202,17 @@ class LocationController:
     
                 if self.reservations[reservation].service.id == serviceID:
     
-                    reservations.append(reservation["id"])
+                    reservations.append(reservation)
             
             for reservationID in reservations:
     
                 self.deleteReservation(reservationID)
+
+            ## Für Service verwendete Box wieder freigeben
+            box = self.services[serviceID]
+            print(box.box.toDict())
+            self.availableBoxes.append(self.services[serviceID].box.toDict())
+            print(self.availableBoxes)
 
             
             del self.services[serviceID]
