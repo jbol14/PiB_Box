@@ -22,28 +22,32 @@ counter = 0
 while counter < len(pins)-1:
     
     print("Pin {} was activated\nPlease enter the Number of the Box that was opened\nIf no Box opened up, please enter 0".format(pins[counter]))
+    try:
+        boxNumber = int(input())
 
-    boxNumber = input()
+        if boxNumber == 0:
+            counter += 1
 
-    if boxNumber == "0":
-        counter += 1
-
-    elif boxNumber not in usedBoxes:
+        elif boxNumber not in usedBoxes:
         
-        usedBoxes.append(boxNumber)
+            usedBoxes.append(boxNumber)
 
-        availableBoxes.append(Box(boxNumber,Pin(pins[counter])))
+            availableBoxes.append(Box(boxNumber,Pin(pins[counter])))
 
-        counter += 1
+            counter += 1
     
-    else:
+        else:
 
-        print("Another Pin was already assigned to Box {}".format(boxNumber))
-
-bx = []
+            print("Another Pin was already assigned to Box {}".format(boxNumber))
+    except ValueError:
+        print("Please Enter a valid number between 1 and 20")
+bx = {
+    "available" : [],
+    "used" :[]
+}
 
 for box in availableBoxes:
-    bx.append(box.toDict())
+    bx["available"].append(box.toDict())
 
 print(json.dumps(bx))
 
