@@ -45,6 +45,7 @@ bx = {
     "available" : [],
     "used" :[]
 }
+input("Done, press any key to continue")
 
 for box in availableBoxes:
     bx["available"].append(box.toDict())
@@ -56,6 +57,8 @@ file = open(CONFIG_PATH,"w")
 file.write(json.dumps(bx))
 
 file.close()
+
+input("Press any key to quit")
 
 
     

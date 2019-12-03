@@ -115,24 +115,39 @@ class LocationController:
     
     ## Service
     def updateService(self, service):
+        ## TODO
+        ## Prüfen, ob der empfangene service bereits bekannt ist oder ob er wirklich neu ist
+        ## Falls bekannt: Dann ist er in self.services
+        serviceID = service["id"]
 
-        box = self.availableBoxes.pop()
+        if service["id"] in self.services:
+            boxNumber = self.services[serviceID].box.boxNumber
+            pinNumber = self.services[serviceID].box.pin.pinNumber
+            self.services[serviceID] = Service(serviceID,service["payload"]["category"], Box(boxNumber,Pin(pinNumber)))
+        else:
+            box = self.availableBoxes.pop()
 
-        concreteBox = Box(box["boxNumber"], Pin(box["pin"]["pinNumber"]))
+            concreteBox = Box(box["boxNumber"], Pin(box["pin"]["pinNumber"]))
 
-        self.services[service["id"]] = Service(service["id"], service["payload"]["category"], concreteBox)
+            ## Wenn Service bekannt muss nur das hier ausgeführt werden, - concreteBox, die muss aus den Eigenschaften des Services hergestellt werden
+
+            self.services[service["id"]] = Service(service["id"], service["payload"]["category"], concreteBox)
+
+            self.usedBoxes.append(concreteBox.toDict())
+
 
         self.writeJsonFile(self.SERVICEPATH, json.dumps(self.createJsonFromDict(self.services)))
 
         #self.writeJsonFile(self.AVAILABLEBOXESPATH, json.dumps({"available" : self.availableBoxes, "used" : self.usedBoxes}))
 
-        self.usedBoxes.append(concreteBox)
+        
 
         tempBx = []
 
         dc = {}
 
         for box in self.availableBoxes:
+            print("available: Typ: ", type(box))
             tempBx.append(box)
         
         dc["available"] = tempBx
@@ -140,7 +155,8 @@ class LocationController:
         tempBx = []
 
         for box in self.usedBoxes:
-            tempBx.append(box.toDict())
+            print("Used: Typ: ", type(box))
+            tempBx.append(box)
         
         dc["used"] = tempBx
 
@@ -209,13 +225,39 @@ class LocationController:
                 self.deleteReservation(reservationID)
 
             ## Für Service verwendete Box wieder freigeben
-            box = self.services[serviceID]
-            print(box.box.toDict())
+            service = self.services[serviceID]
+            #print(box.box.toDict())
             self.availableBoxes.append(self.services[serviceID].box.toDict())
-            print(self.availableBoxes)
+            ## TODO: Aus verfügbaren Boxen entfernen
+            counter = 0
+
+            print(service.box.boxNumber)
+            for box in self.usedBoxes:
+                
+                if box["boxNumber"] == service.box.boxNumber:
+                    print(box)
+                    break
+                counter += 1
+            
+            throwAway = self.usedBoxes.pop(counter)
+
+            print(throwAway, serviceID)
 
             
             del self.services[serviceID]
+
+            tmpBx = []
+            dc = {}
+            for box in self.availableBoxes:
+                tmpBx.append(box)
+            dc["available"] = tmpBx
+
+            tmpBx = []
+            for box in self.usedBoxes:
+                tmpBx.append(box)
+            dc["used"] = tmpBx
+
+            self.writeJsonFile(self.AVAILABLEBOXESPATH, json.dumps(dc))
 
             self.writeJsonFile(self.SERVICEPATH, json.dumps(self.createJsonFromDict(self.services)))
     
